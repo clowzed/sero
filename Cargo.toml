@@ -1,0 +1,43 @@
+[package]
+name = "sero"
+version = "0.1.0"
+edition = "2021"
+authors = ["clowzed <clowzed.work@gmail.com>"]
+description = "Muiltidomain static site hosting"
+publish = false
+readme = "readme.md"
+license = "MIT"
+
+[dependencies]
+axum = { version = "0.6.20", features = ["macros", "tracing", "headers", "multipart"] }
+envy = "0.4.2"
+sea-orm = { version = "0.12.3", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
+tokio = { version = "1.32.0", features = ["full"] }
+tokio-postgres = "0.7.10"
+tracing = "0.1.37"
+tracing-subscriber = { version = "0.3.17", features = ["env-filter", "fmt"] }
+entity = { path = "entity" }
+migration = { path = "migration" }
+serde = { version = "1.0.188", features = ["derive"] }
+jsonwebtoken = "8.3.0"
+axum-extra = { version = "0.8.0", features = ["cookie"] }
+sha256 = "1.4.0"
+thiserror = "1.0.49"
+chrono = "0.4.31"
+futures-util = "0.3.28"
+axum_typed_multipart = "0.10.0"
+uuid = { version = "1.4.1", features = ["v4"] }
+async_zip = { version = "0.0.15", features = ["tokio-fs", "tokio", "full"] }
+bytes = "1.5.0"
+async-trait = "0.1.73"
+tokio-util = { version = "0.7.9", features = ["io"] }
+dotenv = "0.15.0"
+
+[workspace]
+members = [".", "entity", "migration"]
+
+[profile.release]
+lto = true
+strip = true
+opt-level = 3
+codegen-units = 1

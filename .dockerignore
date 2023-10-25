@@ -1,0 +1,8 @@
+target
+.git
+Dockerfile
+docker-compose.yml
+readme.md
+logo.svg
+.github
+nginx-templates

@@ -1,0 +1,63 @@
+version: "3"
+
+services:
+  database:
+    image: postgres:latest
+    user: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=sero
+      - POSTGRES_PASSWORD=1234
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+
+  proxy:
+    image: nginx
+    restart: always
+    environment:
+      - DOLLAR=$
+      - SERVER_PORT=8080
+      - SERVER=server
+      # Edit this
+      - DOMAIN=
+      - ZONE=
+      # End of edit
+    volumes:
+      - ./nginx-templates:/etc/nginx/templates
+    ports:
+      - 443:443
+      - 80:80
+    links:
+      - server
+
+  server:
+    image: clowzed/sero
+    restart: always
+    build: .
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - server-files:/app
+    environment:
+       - DATABASE_URL=postgresql://postgres:1234@database/sero
+       - PORT=8080
+       # You can edit this section
+       # Empty means no limits
+       - MAX_USERS=1
+       - MAX_SITES_PER_USER=100
+       - MAX_BODY_LIMIT_BYTES=10000000
+       - RUST_LOG=none,sero=trace
+       # end of section
+
+volumes:
+  server-files:
+  pgdata:
