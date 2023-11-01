@@ -28,24 +28,24 @@
 - [🚀 Features](#-features)
 - [🔌 Built With](#-built-with)
 - [⌨️ Getting Started](#️-getting-started)
-	- [Prerequisites](#prerequisites)
-	- [Installation](#installation)
-		- [Clone this repository](#clone-this-repository)
-		- [✏️ Configure DNS records](#️-configure-dns-records)
-		- [✏️ Configure `docker-compose.yml`](#️-configure-docker-composeyml)
-		- [🚀 Deploy](#-deploy)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+        - [Clone this repository](#clone-this-repository)
+        - [✏️ Configure DNS records](#️-configure-dns-records)
+        - [✏️ Configure `docker-compose.yml`](#️-configure-docker-composeyml)
+        - [🚀 Deploy](#-deploy)
 - [✨ Usage](#-usage)
-	- [Installing cli tool](#installing-cli-tool)
-	- [🆕 Creating and initializing folder](#-creating-and-initializing-folder)
-	- [🆕 Creating index.html](#-creating-indexhtml)
-	- [🔍 Inspecting `sero.toml`](#-inspecting-serotoml)
-	- [✏️ Changing `sero.toml`](#️-changing-serotoml)
-	- [⬆️ Registration and uploading](#️-registration-and-uploading)
-		- [Now your site is available at http://oursite.awesome.com/index.html](#now-your-site-is-available-at-httpoursiteawesomecomindexhtml)
-	- [Advanced usage with `new` features](#advanced-usage-with-new-features)
+    - [Installing cli tool](#installing-cli-tool)
+    - [🆕 Creating and initializing folder](#-creating-and-initializing-folder)
+    - [🆕 Creating index.html](#-creating-indexhtml)
+    - [🔍 Inspecting `sero.toml`](#-inspecting-serotoml)
+    - [✏️ Changing `sero.toml`](#️-changing-serotoml)
+    - [⬆️ Registration and uploading](#️-registration-and-uploading)
+        - [Now your site is available at http://oursite.awesome.com/index.html](#now-your-site-is-available-at-httpoursiteawesomecomindexhtml)
+    - [Advanced usage with `new` features](#advanced-usage-with-new-features)
 - [📍 Roadmap](#-roadmap)
 - [🧑‍🤝‍🧑 Contributing](#-contributing)
-	- [Creating A Pull Request](#creating-a-pull-request)
+    - [Creating A Pull Request](#creating-a-pull-request)
 - [License](#license)
 - [Authors](#authors)
 
@@ -222,15 +222,15 @@ sero teardown
 
 ## 📍 Roadmap
 
-See the [open issues](https://github.com/ShaanCoding/ReadME-Generator/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/clowzed/sero/issues) for a list of proposed features (and known issues).
 
 ## 🧑‍🤝‍🧑 Contributing
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-* If you have suggestions for adding or removing projects, feel free to [open an issue](https://github.com/ShaanCoding/ReadME-Generator/issues/new) to discuss it, or directly create a pull request after you edit the *README.md* file with necessary changes.
+* If you have suggestions for adding or removing projects, feel free to [open an issue](https://github.com/clowzed/sero/issues/new) to discuss it, or directly create a pull request after you edit the *README.md* file with necessary changes.
 * Please make sure you check your spelling and grammar.
 * Create individual PR for each suggestion.
-* Please also read through the [Code Of Conduct](https://github.com/ShaanCoding/ReadME-Generator/blob/main/CODE_OF_CONDUCT.md) before posting your first idea as well.
+* Please also read through the [Code Of Conduct](https://github.com/clowzed/sero/blob/main/CODE_OF_CONDUCT.md) before posting your first idea as well.
 
 ### Creating A Pull Request
 
