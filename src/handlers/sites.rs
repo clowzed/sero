@@ -99,6 +99,18 @@ pub async fn download(
     }
 }
 
+pub async fn index_redirect(
+    State(state): State<Arc<AppState>>,
+    SubdomainModelExtractor(subdomain): SubdomainModelExtractor,
+) -> Response {
+    file(
+        State(state),
+        SubdomainModelExtractor(subdomain),
+        Path(String::from("index.html")),
+    )
+    .await
+}
+
 pub async fn file(
     State(state): State<Arc<AppState>>,
     SubdomainModelExtractor(subdomain): SubdomainModelExtractor,

@@ -57,6 +57,7 @@ async fn main() {
     let mut app = Router::new()
         .nest("/api", api_router)
         .route("/*path", get(handlers::sites::file))
+        .route("/", get(handlers::sites::index_redirect))
         .with_state(state.clone());
 
     if config.max_body_limit_size.is_some() {
