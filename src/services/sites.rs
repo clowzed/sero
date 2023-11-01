@@ -138,6 +138,17 @@ impl SitesService {
         path: String,
         connection: &T,
     ) -> Result<Option<(bool, std::path::PathBuf)>, SiteServiceError> {
+        let parsed_path = PathBuf::from(&path);
+
+        let path = match parsed_path.extension() {
+            Some(_) => path,
+            None => parsed_path
+                .with_extension("html")
+                .to_str()
+                .unwrap_or_default()
+                .to_string(),
+        };
+
         let files = subdomain
             .find_related(FileEntity)
             .filter(FileColumn::UserPath.is_in([&path, "404.html"]))

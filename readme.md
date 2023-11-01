@@ -73,6 +73,7 @@ One key feature that it is self-hosted. This gives users more flexibility and co
 - Easy upload with cli tool
 - Custom 404.html `(on 404 status user will see your 404.html)`
 - Custom 503.html `new` `(on disabled site)`
+- Clean urls
 
 ## 🔌 Built With
 - `Rust`
@@ -121,7 +122,7 @@ Simply open a [docker-compose.yml](https://github.com/clowzed/sero/blob/master/d
 
 2. Configure desired limits if you want (you can skip this)
 
-| environment variable | description                                        | already setted  |
+| environment variable | description                                        | already set     |
 |----------------------|----------------------------------------------------|-----------------|
 | MAX_USERS            | Maximum amount of users to be registered           | 1               |
 | MAX_SITES_PER_USER   | Maximum amount of sites which each user can upload | 100             |
