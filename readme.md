@@ -28,24 +28,24 @@
 - [🚀 Features](#-features)
 - [🔌 Built With](#-built-with)
 - [⌨️ Getting Started](#️-getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
-        - [Clone this repository](#clone-this-repository)
-        - [✏️ Configure DNS records](#️-configure-dns-records)
-        - [✏️ Configure `docker-compose.yml`](#️-configure-docker-composeyml)
-        - [🚀 Deploy](#-deploy)
+	- [Prerequisites](#prerequisites)
+	- [Installation](#installation)
+		- [Clone this repository](#clone-this-repository)
+		- [✏️ Configure DNS records](#️-configure-dns-records)
+		- [✏️ Configure `docker-compose.yml`](#️-configure-docker-composeyml)
+		- [🚀 Deploy](#-deploy)
 - [✨ Usage](#-usage)
-    - [Installing cli tool](#installing-cli-tool)
-    - [🆕 Creating and initializing folder](#-creating-and-initializing-folder)
-    - [🆕 Creating index.html](#-creating-indexhtml)
-    - [🔍 Inspecting `sero.toml`](#-inspecting-serotoml)
-    - [✏️ Changing `sero.toml`](#️-changing-serotoml)
-    - [⬆️ Registration and uploading](#️-registration-and-uploading)
-        - [Now your site is available at http://oursite.awesome.com/index.html](#now-your-site-is-available-at-httpoursiteawesomecomindexhtml)
-    - [Advanced usage with `new` features](#advanced-usage-with-new-features)
+	- [Installing cli tool](#installing-cli-tool)
+	- [🆕 Creating and initializing folder](#-creating-and-initializing-folder)
+	- [🆕 Creating index.html](#-creating-indexhtml)
+	- [🔍 Inspecting `sero.toml`](#-inspecting-serotoml)
+	- [✏️ Changing `sero.toml`](#️-changing-serotoml)
+	- [⬆️ Registration and uploading](#️-registration-and-uploading)
+		- [Now your site is available at http://oursite.awesome.com/index.html](#now-your-site-is-available-at-httpoursiteawesomecomindexhtml)
+	- [Advanced usage with `new` features](#advanced-usage-with-new-features)
 - [📍 Roadmap](#-roadmap)
 - [🧑‍🤝‍🧑 Contributing](#-contributing)
-    - [Creating A Pull Request](#creating-a-pull-request)
+	- [Creating A Pull Request](#creating-a-pull-request)
 - [License](#license)
 - [Authors](#authors)
 
@@ -243,7 +243,7 @@ Contributions are what make the open source community such an amazing place to b
 
 ## License
 
-Distributed under the MIT License
+[Distributed under the MIT License](https://github.com/clowzed/sero/blob/master/LICENSE)
 
 ## Authors
 
