@@ -88,6 +88,11 @@ impl SitesService {
             }
         };
 
+        CorsEntity::delete_many()
+            .filter(CorsColumn::SubdomainId.eq(subdomain.id))
+            .exec(connection)
+            .await?;
+
         match new_archive_file.write_all(&contents).await {
             Ok(()) => {
                 let mut active: ActiveSubdomain = subdomain.clone().into();

@@ -13,7 +13,7 @@ impl Default for Config {
         let mut config: Self =
             envy::from_env().expect("Failed to read config from environment variables!");
         if config.jwt_secret.is_none() {
-            config.jwt_secret = Some(uuid::Uuid::new_v4().to_string())
+            config.jwt_secret = Some(uuid::Uuid::new_v4().to_string());
         }
         config
     }

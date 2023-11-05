@@ -294,11 +294,6 @@ paths:
       responses:
         "200":
           description: Site was successfully uploaded
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
 
         "403":
           description: Subdomain is owned by another user
@@ -314,6 +309,74 @@ paths:
                 $ref: "#/components/schemas/Details"
         "400":
           description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Details"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Details"
+  /api/cors/add:
+    post:
+      summary: Add origin
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Origin"
+      responses:
+        "200":
+          description: Origin was successfully added
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Details"
+        "401":
+          description: Authentication failed, unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Details"
+        "403":
+          description: Subdomain is owned by another user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Details"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Details"
+  /api/cors/clear:
+    post:
+      summary: Clear related origins
+
+      responses:
+        "200":
+          description: Origins were successfully removed
+          
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Details"
+        "401":
+          description: Authentication failed, unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Details"
+        "403":
+          description: Subdomain is owned by another user
           content:
             application/json:
               schema:
@@ -344,6 +407,12 @@ components:
       properties:
         details:
           type: string
+    Origin:
+      type: object
+      properties:
+        origin:
+          type: string
+    
   securitySchemes:
     bearerAuth:
       type: http

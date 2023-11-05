@@ -1,7 +1,7 @@
 use axum::{
     async_trait,
     extract::{FromRef, FromRequestParts},
-    http::request::Parts,
+    http::{request::Parts, HeaderMap},
 };
 use sea_orm::prelude::*;
 use std::sync::Arc;
@@ -59,19 +59,10 @@ where
     }
 }
 
-#[async_trait]
-impl<S> FromRequestParts<S> for Subdomain
-where
-    Arc<crate::AppState>: FromRef<S>,
-
-    S: Send + Sync,
-{
-    type Rejection = SeroError;
-
-    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+impl Subdomain {
+    pub fn from_headers(headers: &HeaderMap) -> Result<Self, SeroError> {
         Ok(Self({
-            let header = parts
-                .headers
+            let header = headers
                 .get("X-Subdomain")
                 .ok_or(SeroError::XSubdomainHeaderMissing)?
                 .to_str()
@@ -87,6 +78,20 @@ where
 }
 
 #[async_trait]
+impl<S> FromRequestParts<S> for Subdomain
+where
+    Arc<crate::AppState>: FromRef<S>,
+
+    S: Send + Sync,
+{
+    type Rejection = SeroError;
+
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+        Self::from_headers(&parts.headers)
+    }
+}
+
+#[async_trait]
 impl<S> FromRequestParts<S> for SubdomainModel
 where
     Arc<crate::AppState>: FromRef<S>,
@@ -96,10 +101,20 @@ where
 
     #[tracing::instrument(skip(parts, state))]
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        Self::from_headers(&parts.headers, state).await
+    }
+}
+
+impl SubdomainModel {
+    pub async fn from_headers<S>(headers: &HeaderMap, state: &S) -> Result<Self, SeroError>
+    where
+        Arc<crate::AppState>: FromRef<S>,
+        S: Send + Sync,
+    {
         let app_state = Arc::from_ref(state);
 
-        let subdomain_name = Subdomain::from_request_parts(parts, state).await?.0;
-        Ok(match entity::prelude::SubdomainEntity::find()
+        let subdomain_name = Subdomain::from_headers(headers)?.0;
+        match entity::prelude::SubdomainEntity::find()
             .filter(entity::prelude::SubdomainColumn::Name.eq(&subdomain_name))
             .one(&app_state.connection)
             .await
@@ -107,7 +122,7 @@ where
             Ok(Some(subdomain)) => Ok(Self(subdomain)),
             Ok(None) => Err(SeroError::SubdomainWasNotFound(subdomain_name)),
             Err(cause) => Err(SeroError::InternalServerError(Box::new(cause))),
-        }?)
+        }
     }
 }
 

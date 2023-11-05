@@ -3,18 +3,23 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "user")]
+#[sea_orm(table_name = "cors")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
-    #[sea_orm(unique)]
-    pub username: String,
-    pub password: String,
+    pub subdomain_id: i32,
+    pub origin: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(has_many = "super::subdomain::Entity")]
+    #[sea_orm(
+        belongs_to = "super::subdomain::Entity",
+        from = "Column::SubdomainId",
+        to = "super::subdomain::Column::Id",
+        on_update = "NoAction",
+        on_delete = "Cascade"
+    )]
     Subdomain,
 }
 
@@ -25,3 +30,9 @@ impl Related<super::subdomain::Entity> for Entity {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
+
+impl Model {
+    pub fn matches(&self, origin: &str) -> bool {
+        self.origin == "*" || self.origin == origin
+    }
+}
