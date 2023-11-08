@@ -68,7 +68,7 @@ async fn main() {
         .route("/", get(handlers::sites::index_redirect))        
         .layer(
             CorsLayer::new()
-                .allow_methods(AllowMethods::exact(Method::GET))
+                .allow_methods(AllowMethods::list([Method::GET, Method::POST, Method::OPTIONS]))
                 .allow_headers(AllowHeaders::list([HeaderName::from_static("x-subdomain")]))
                 .allow_origin(AllowOrigin::predicate(move |origin, parts| {
                     let cloned_state = cloned_state.clone();
