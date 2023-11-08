@@ -81,6 +81,7 @@ async fn main() {
                     let (tx, rx) = mpsc::channel();
 
                     tokio::spawn(async move {
+                        tracing::info!("Starting cors!");
                         let subdomain_model_extractor =
                         SubdomainModel::from_headers(&cloned_headers, &cloned_state)
                                 .await
