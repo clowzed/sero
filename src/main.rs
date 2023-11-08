@@ -62,9 +62,10 @@ async fn main() {
 
     let cloned_state = state.clone();
 
-    let files_router = Router::new()
+    let mut app = Router::new()
+        .nest("/api", api_router)
         .route("/*path", get(handlers::sites::file))
-        .route("/", get(handlers::sites::index_redirect))
+        .route("/", get(handlers::sites::index_redirect))        
         .layer(
             CorsLayer::new()
                 .allow_methods(AllowMethods::exact(Method::GET))
@@ -104,11 +105,7 @@ async fn main() {
 
                     rx.recv().unwrap_or(false)
                 })),
-        );
-
-    let mut app = Router::new()
-        .nest("/api", api_router)
-        .nest("/", files_router)
+        )
         .with_state(state.clone());
 
     if config.max_body_limit_size.is_some() {
