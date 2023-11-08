@@ -322,6 +322,14 @@ paths:
   /api/cors/add:
     post:
       summary: Add origin
+      parameters:
+        - in: header
+          name: X-Subdomain
+          schema:
+            type: string
+          required: true
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -358,6 +366,15 @@ paths:
   /api/cors/clear:
     post:
       summary: Clear related origins
+      parameters:
+        - in: header
+          name: X-Subdomain
+          schema:
+            type: string
+          required: true
+      security:
+        - bearerAuth: []
+
 
       responses:
         "200":
