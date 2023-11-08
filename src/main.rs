@@ -68,6 +68,10 @@ async fn main() {
         .route("/", get(handlers::sites::index_redirect))        
         .layer(
             CorsLayer::new()
+            .allow_methods(AllowMethods::any())
+            .allow_headers(AllowHeaders::any())
+            .allow_origin(AllowOrigin::any())
+            /* CorsLayer::new()
                 .allow_methods(AllowMethods::list([Method::GET, Method::POST, Method::OPTIONS]))
                 .allow_headers(AllowHeaders::list([HeaderName::from_static("x-subdomain")]))
                 .allow_origin(AllowOrigin::predicate(move |origin, parts| {
@@ -105,7 +109,7 @@ async fn main() {
                     });
 
                     rx.recv().unwrap_or(false)
-                })),
+                })), */
         )
         .with_state(state.clone());
 
