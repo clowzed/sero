@@ -2,10 +2,12 @@ use std::{fmt::Debug, net::SocketAddr, sync::mpsc};
 
 use axum::{
     extract::DefaultBodyLimit,
-    http::{HeaderName, Method, StatusCode},
+    http::StatusCode,
     routing::{get, post},
     Router,
 };
+use futures::executor::block_on;
+
 use extractors::SubdomainModel;
 use services::cors::CorsService;
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
@@ -70,10 +72,6 @@ async fn main() {
             CorsLayer::new()
             .allow_methods(AllowMethods::any())
             .allow_headers(AllowHeaders::any())
-            .allow_origin(AllowOrigin::any())
-            /* CorsLayer::new()
-                .allow_methods(AllowMethods::list([Method::GET, Method::POST, Method::OPTIONS]))
-                .allow_headers(AllowHeaders::list([HeaderName::from_static("x-subdomain")]))
                 .allow_origin(AllowOrigin::predicate(move |origin, parts| {
                     let cloned_state = cloned_state.clone();
                     let cloned_origin = origin
@@ -84,7 +82,8 @@ async fn main() {
                     let cloned_headers = parts.headers.clone();
                     let (tx, rx) = mpsc::channel();
 
-                    tokio::spawn(async move {
+                    std::thread::spawn(
+                     move ||  block_on(async move {
                         tracing::info!("Starting cors!");
                         let subdomain_model_extractor =
                         SubdomainModel::from_headers(&cloned_headers, &cloned_state)
@@ -106,10 +105,11 @@ async fn main() {
                         .unwrap_or(false);
 
                         tx.send(res).ok();
-                    });
+                    }
+                    ));
 
                     rx.recv().unwrap_or(false)
-                })), */
+                }))
         )
         .with_state(state.clone());
 
