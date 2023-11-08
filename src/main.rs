@@ -6,7 +6,6 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use futures::executor::block_on;
 
 use extractors::SubdomainModel;
 use services::cors::CorsService;
@@ -72,43 +71,40 @@ async fn main() {
             CorsLayer::new()
             .allow_methods(AllowMethods::any())
             .allow_headers(AllowHeaders::any())
-                .allow_origin(AllowOrigin::predicate(move |origin, parts| {
-                    let cloned_state = cloned_state.clone();
-                    let cloned_origin = origin
-                        .clone()
-                        .to_str()
-                        .map(|s| s.to_string())
-                        .unwrap_or_default();
-                    let cloned_headers = parts.headers.clone();
-                    let (tx, rx) = mpsc::channel();
-
-                    std::thread::spawn(
-                     move ||  block_on(async move {
-                        tracing::info!("Starting cors!");
-                        let subdomain_model_extractor =
+                .allow_origin(AllowOrigin::predicate(move |origin, parts| {let cloned_headers = parts.headers.clone();
+            let (tx, rx) = mpsc::channel();
+            
+            let cloned_state = cloned_state.clone();
+            let cloned_origin = origin.to_owned().to_str().map(|s| s.to_string()).unwrap_or_default();
+            
+            std::thread::spawn(move || {
+                let rt = tokio::runtime::Runtime::new().unwrap();
+                rt.block_on(async move {
+                    tracing::info!("Starting cors!");
+                    let subdomain_model_extractor =
                         SubdomainModel::from_headers(&cloned_headers, &cloned_state)
-                                .await
-                                .map_err(|cause| {
-                                    tracing::error!(%cause, "Failed to extract subdomain model from headers for cors!");
-                                });
-                        if subdomain_model_extractor.is_err() {
-                            tx.send(false).ok();
-                            return;
-                        }
-
-                        let res = CorsService::check(
-                            subdomain_model_extractor.unwrap().0,
-                            &cloned_origin,
-                            &cloned_state.connection,
-                        )
-                        .await
-                        .unwrap_or(false);
-
-                        tx.send(res).ok();
+                            .await
+                            .map_err(|cause| {
+                                tracing::error!(%cause, "Failed to extract subdomain model from headers for cors!");
+                            });
+                    if subdomain_model_extractor.is_err() {
+                        tx.send(false).ok();
+                        return;
                     }
-                    ));
-
-                    rx.recv().unwrap_or(false)
+            
+                    let res = CorsService::check(
+                        subdomain_model_extractor.unwrap().0,
+                        &cloned_origin,
+                        &cloned_state.connection,
+                    )
+                    .await
+                    .unwrap_or(false);
+            
+                    tx.send(res).ok();
+                });
+            });
+            
+            rx.recv().unwrap_or(false)
                 }))
         )
         .with_state(state.clone());
