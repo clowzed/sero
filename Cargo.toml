@@ -32,6 +32,13 @@ bytes = "1.5.0"
 async-trait = "0.1.73"
 tokio-util = { version = "0.7.9", features = ["io"] }
 dotenv = "0.15.0"
+tower = { version = "0.4.13", features = ["util"] }
+serde_urlencoded = "0.7.1"
+serde_json = "1.0.108"
+mime = "0.3.17"
+axum-test-helper = "0.3.0"
+hyper = "0.14.27"
+reqwest = { version = "0.11.22", features = ["json", "multipart"] }
 
 [workspace]
 members = [".", "entity", "migration"]
