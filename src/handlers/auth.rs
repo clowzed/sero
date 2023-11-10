@@ -15,7 +15,7 @@ use std::sync::Arc;
 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct AuthToken {
-    token: Jwt,
+    pub token: Jwt,
 }
 
 #[tracing::instrument(skip(state))]
