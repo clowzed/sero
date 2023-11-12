@@ -25,109 +25,67 @@ pub enum SeroError {
     EmptyCredentials,
 }
 
-impl IntoResponse for SeroError {
-    fn into_response(self) -> axum::response::Response {
-        let response = match self {
-            SeroError::XSubdomainHeaderMissing => (
-                StatusCode::BAD_REQUEST,
-                Json(Details {
-                    details: "X-Subdomain header is missing!".into(),
-                }),
-            ),
-            SeroError::AuthorizationHeaderMissing => (
-                StatusCode::BAD_REQUEST,
-                Json(Details {
-                    details: "Authorization header is missing!".into(),
-                }),
-            ),
-            SeroError::AuthorizationHeaderBadSchema => (
-                StatusCode::BAD_REQUEST,
-                Json(Details {
-                    details: "Authorization header does not match schema!
-                    Required schema: Authorization: Bearer <token>"
-                        .into(),
-                }),
-            ),
-            SeroError::SubdomainIsOwnedByAnotherUser(subdomain_name) => (
-                StatusCode::FORBIDDEN,
-                Json(Details {
-                    details: format!(
-                        "Subdomain with name {} is owned by another user!",
-                        subdomain_name
-                    ),
-                }),
-            ),
-            SeroError::AuthorizationHeaderBabChars => (
-                StatusCode::BAD_REQUEST,
-                Json(Details {
-                    details: "Authorization header contains invalid characters!".into(),
-                }),
-            ),
+impl std::fmt::Debug for SeroError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", match self {
+            SeroError::XSubdomainHeaderMissing => "X-Subdomain header is missing!".to_string(),
+            SeroError::AuthorizationHeaderMissing => "Authorization header is missing!".to_string(),
+            SeroError::AuthorizationHeaderBadSchema => "Authorization header does not match schema! Required schema: Authorization: Bearer <token>".to_string(),
+            SeroError::SubdomainIsOwnedByAnotherUser(subdomain_name) => format!("Subdomain with name {} is owned by another user!", subdomain_name),
+            SeroError::AuthorizationHeaderBabChars => "Authorization header contains invalid characters!".to_string(),
             SeroError::InternalServerError(cause) => {
                 tracing::error!(%cause, "Error!");
-                (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    Json(Details {
-                        details: "Some error occurred on the server!".into(),
-                    }),
-                )
-            }
-            SeroError::UserWasNotFoundUsingJwt => (
-                StatusCode::UNAUTHORIZED,
-                Json(Details {
-                    details: "User with id from jwt token was not found!".into(),
-                }),
-            ),
-            SeroError::RegisteredUserLimitExceeded => (
-                StatusCode::FORBIDDEN,
-                Json(Details {
-                    details: "Registered user limit exceeded!".into(),
-                }),
-            ),
-            SeroError::Unauthorized => (
-                StatusCode::UNAUTHORIZED,
-                Json(Details {
-                    details: "Unauthorized! Bad credentials were provided!".into(),
-                }),
-            ),
-            SeroError::UserHasAlreadyBeenRegistered => (
-                StatusCode::CONFLICT,
-                Json(Details {
-                    details: "User with this username has already been registered!".into(),
-                }),
-            ),
-            SeroError::SubdomainWasNotFound(subdomain_name) => (
-                StatusCode::NOT_FOUND,
-                Json(Details {
-                    details: format!("Subdomain with name {subdomain_name} was not found!"),
-                }),
-            ),
-            SeroError::ArchiveFileWasNotFoundForSubdomain(subdomain_name) => (
-                StatusCode::NOT_FOUND,
-                Json(Details {
-                    details: format!("Archive file was not found for subdomain {subdomain_name}"),
-                }),
-            ),
-            SeroError::MaxSitesPerUserLimitExceeded => (
-                StatusCode::FORBIDDEN,
-                Json(Details {
-                    details: "Max sites per this user limit exceeded!".into(),
-                }),
-            ),
-            SeroError::SiteDisabled => (
-                StatusCode::SERVICE_UNAVAILABLE,
-                Json(Details {
-                    details: "Service is currently unavailable!".into(),
-                }),
-            ),
-            SeroError::EmptyCredentials => (
-                StatusCode::BAD_REQUEST,
-                Json(Details {
-                    details: "Username or password is empty!".into(),
-                }),
-            ),
-        };
+                "Some error occurred on the server!".to_string()
+            },
+            SeroError::UserWasNotFoundUsingJwt => "User with id from jwt token was not found!".to_string(),
+            SeroError::RegisteredUserLimitExceeded => "Registered user limit exceeded!".to_string(),
+            SeroError::Unauthorized => "Unauthorized! Bad credentials were provided!".to_string(),
+            SeroError::UserHasAlreadyBeenRegistered => "User with this username has already been registered!".to_string(),
+            SeroError::SubdomainWasNotFound(subdomain_name) => format!("Subdomain with name {} was not found!", subdomain_name),
+            SeroError::ArchiveFileWasNotFoundForSubdomain(subdomain_name) => format!("Archive file was not found for subdomain {}", subdomain_name),
+            SeroError::MaxSitesPerUserLimitExceeded => "Max sites per this user limit exceeded!".to_string(),
+            SeroError::SiteDisabled => "Site is disabled!".to_string(),
+            SeroError::EmptyCredentials => "Empty credentials were provided!".to_string(),
+        })
+    }
+}
 
+impl std::fmt::Display for SeroError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl From<&SeroError> for StatusCode {
+    fn from(val: &SeroError) -> Self {
+        match val {
+            SeroError::XSubdomainHeaderMissing => StatusCode::BAD_REQUEST,
+            SeroError::AuthorizationHeaderMissing => StatusCode::BAD_REQUEST,
+            SeroError::AuthorizationHeaderBadSchema => StatusCode::BAD_REQUEST,
+            SeroError::SubdomainIsOwnedByAnotherUser(_) => StatusCode::FORBIDDEN,
+            SeroError::AuthorizationHeaderBabChars => StatusCode::BAD_REQUEST,
+            SeroError::InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            SeroError::UserWasNotFoundUsingJwt => StatusCode::UNAUTHORIZED,
+            SeroError::RegisteredUserLimitExceeded => StatusCode::FORBIDDEN,
+            SeroError::Unauthorized => StatusCode::UNAUTHORIZED,
+            SeroError::UserHasAlreadyBeenRegistered => StatusCode::CONFLICT,
+            SeroError::SubdomainWasNotFound(_) => StatusCode::NOT_FOUND,
+            SeroError::ArchiveFileWasNotFoundForSubdomain(_) => StatusCode::NOT_FOUND,
+            SeroError::MaxSitesPerUserLimitExceeded => StatusCode::FORBIDDEN,
+            SeroError::SiteDisabled => StatusCode::SERVICE_UNAVAILABLE,
+            SeroError::EmptyCredentials => StatusCode::BAD_REQUEST,
+        }
+    }
+}
+
+impl IntoResponse for SeroError {
+    fn into_response(self) -> axum::response::Response {
+        let response = (
+            Into::<StatusCode>::into(&self),
+            Json(Details {
+                details: format!("{:?}", self),
+            }),
+        );
         tracing::error!(cause = response.1.details, "Response with error!");
         response.into_response()
     }

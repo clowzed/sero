@@ -17,6 +17,8 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(has_many = "super::cors::Entity")]
+    Cors,
     #[sea_orm(has_many = "super::file::Entity")]
     File,
     #[sea_orm(
@@ -27,6 +29,12 @@ pub enum Relation {
         on_delete = "NoAction"
     )]
     User,
+}
+
+impl Related<super::cors::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Cors.def()
+    }
 }
 
 impl Related<super::file::Entity> for Entity {
