@@ -55,50 +55,50 @@ async fn app() -> Router {
 
     let cloned_state = state.clone();
 
-    let cors_layer = CorsLayer::new()
-    .allow_methods(AllowMethods::any())
-    .allow_headers(AllowHeaders::any())
-    .allow_origin(AllowOrigin::predicate(move |origin, parts| {
-        let cloned_headers = parts.headers.clone();
-        let (tx, rx) = mpsc::channel();
+    let _cors_layer = CorsLayer::new()
+        .allow_methods(AllowMethods::any())
+        .allow_headers(AllowHeaders::any())
+        .allow_origin(AllowOrigin::predicate(move |origin, parts| {
+            let cloned_headers = parts.headers.clone();
+            let (tx, rx) = mpsc::channel();
 
-        let cloned_state = cloned_state.clone();
-        let cloned_origin = origin
-            .to_owned()
-            .to_str()
-            .map(|s| s.to_string())
-            .unwrap_or_default();
+            let cloned_state = cloned_state.clone();
+            let cloned_origin = origin
+                .to_owned()
+                .to_str()
+                .map(|s| s.to_string())
+                .unwrap_or_default();
 
-        std::thread::spawn(move || {
-            let rt = tokio::runtime::Runtime::new().unwrap();
-            rt.block_on(async move {
-                tracing::info!("Starting cors!");
-                let subdomain_model_extractor =
-                    SubdomainModel::from_headers(&cloned_headers, &cloned_state)
-                        .await
-                        .map_err(|cause| {
-                            tracing::error!(%cause, 
+            std::thread::spawn(move || {
+                let rt = tokio::runtime::Runtime::new().unwrap();
+                rt.block_on(async move {
+                    tracing::info!("Starting cors!");
+                    let subdomain_model_extractor =
+                        SubdomainModel::from_headers(&cloned_headers, &cloned_state)
+                            .await
+                            .map_err(|cause| {
+                                tracing::error!(%cause, 
                     "Failed to extract subdomain model from headers for cors!");
-                        });
-                if subdomain_model_extractor.is_err() {
-                    tx.send(false).ok();
-                    return;
-                }
+                            });
+                    if subdomain_model_extractor.is_err() {
+                        tx.send(false).ok();
+                        return;
+                    }
 
-                let res = CorsService::check(
-                    subdomain_model_extractor.unwrap().0,
-                    &cloned_origin,
-                    &cloned_state.connection,
-                )
-                .await
-                .unwrap_or(false);
+                    let res = CorsService::check(
+                        subdomain_model_extractor.unwrap().0,
+                        &cloned_origin,
+                        &cloned_state.connection,
+                    )
+                    .await
+                    .unwrap_or(false);
 
-                tx.send(res).ok();
+                    tx.send(res).ok();
+                });
             });
-        });
 
-        rx.recv().unwrap_or(false)
-    }));
+            rx.recv().unwrap_or(false)
+        }));
 
     let mut app = Router::new()
         .nest("/api", api_router)
