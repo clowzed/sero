@@ -21,6 +21,22 @@ pub struct AuthCredentials {
 }
 
 impl AuthCredentials {
+    pub fn random() -> Self {
+        Self {
+            username: uuid::Uuid::new_v4().to_string(),
+            password: uuid::Uuid::new_v4().to_string(),
+        }
+    }
+
+    pub fn random_unvalid() -> Self {
+        Self {
+            username: uuid::Uuid::new_v4().to_string(),
+            password: "".to_owned(),
+        }
+    }
+}
+
+impl AuthCredentials {
     pub fn valid(&self) -> bool {
         !self.username.is_empty() && !self.password.is_empty()
     }

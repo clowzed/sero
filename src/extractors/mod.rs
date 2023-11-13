@@ -30,6 +30,7 @@ where
 {
     type Rejection = SeroError;
 
+    #[tracing::instrument(skip(parts, state))]
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let app_state = Arc::from_ref(state);
 
@@ -60,6 +61,7 @@ where
 }
 
 impl Subdomain {
+    #[tracing::instrument(skip(headers))]
     pub fn from_headers(headers: &HeaderMap) -> Result<Self, SeroError> {
         Ok(Self({
             let header = headers
@@ -106,6 +108,7 @@ where
 }
 
 impl SubdomainModel {
+    #[tracing::instrument(skip(headers, state))]
     pub async fn from_headers<S>(headers: &HeaderMap, state: &S) -> Result<Self, SeroError>
     where
         Arc<crate::AppState>: FromRef<S>,

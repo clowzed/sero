@@ -15,7 +15,11 @@ impl CorsService {
         Ok(subdomain
             .find_related(CorsEntity)
             .all(connection)
-            .await?
+            .await
+            .map_err(|cause| {
+                tracing::error!(%cause, "Failed to retrieve origins!");
+                cause
+            })?
             .iter()
             .any(|origin_model| origin_model.matches(origin)))
     }
