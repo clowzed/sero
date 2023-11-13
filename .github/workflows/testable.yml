@@ -1,4 +1,4 @@
-name: docker build testable
+name: docker build latest testable
 
 on:
   push:

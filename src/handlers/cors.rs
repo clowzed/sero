@@ -14,9 +14,9 @@ use entity::prelude::*;
 use sea_orm::{prelude::*, Set};
 use std::sync::Arc;
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct OriginForm {
-    origin: String,
+    pub origin: String,
 }
 
 #[tracing::instrument(skip(state))]
