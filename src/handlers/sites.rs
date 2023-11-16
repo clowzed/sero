@@ -13,7 +13,10 @@ use sea_orm::prelude::*;
 use axum::{
     body::StreamBody,
     extract::{Path, State},
-    http::StatusCode,
+    http::{
+        header::{self, HeaderMap},
+        StatusCode,
+    },
     response::{IntoResponse, Response},
 };
 
@@ -114,7 +117,7 @@ pub async fn index_redirect(
 pub async fn file(
     State(state): State<Arc<AppState>>,
     SubdomainModelExtractor(subdomain): SubdomainModelExtractor,
-    Path(mut path): Path<String>,
+    Path(path): Path<String>,
 ) -> Response {
     if !subdomain.enabled {
         return match SitesService::getfile(&subdomain, "503.html".to_owned(), &state.connection)
@@ -132,20 +135,24 @@ pub async fn file(
         };
     }
 
-    if path.is_empty() {
-        path = "index.html".to_owned();
-    }
     match SitesService::getfile(&subdomain, path, &state.connection).await {
-        Ok(Some((is_404, file))) => (
-            match is_404 {
-                true => StatusCode::NOT_FOUND,
-                false => StatusCode::OK,
-            },
-            StreamBody::new(ReaderStream::new(
-                tokio::fs::File::open(file).await.unwrap(),
-            )),
-        )
-            .into_response(),
+        Ok(Some((is_404, file))) => {
+            let mut headers = HeaderMap::new();
+            if let Some(mime_type) = mime_guess::from_path(&file).first() {
+                headers.insert(header::CONTENT_TYPE, mime_type.to_string().parse().unwrap());
+            }
+            (
+                match is_404 {
+                    true => StatusCode::NOT_FOUND,
+                    false => StatusCode::OK,
+                },
+                headers,
+                StreamBody::new(ReaderStream::new(
+                    tokio::fs::File::open(file).await.unwrap(),
+                )),
+            )
+                .into_response()
+        }
         Ok(None) => StatusCode::NOT_FOUND.into_response(),
         Err(cause) => SeroError::InternalServerError(Box::new(cause)).into_response(),
     }
