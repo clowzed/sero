@@ -1,0 +1,54 @@
+use super::{error::ListOriginsError, response::ListOriginsResponse};
+use crate::{extractors::*, services::origin::service::Service as CorsService, state::State as AppState};
+use axum::{extract::State, response::IntoResponse, Json};
+use std::sync::Arc;
+
+/// List all origins for specified subdomain for dynamic CORS (Cross-Origin Resource Sharing) management.
+///
+/// This endpoint allows users to list all origins that are permitted to access resources
+/// on their specified subdomains. The action is authenticated using a JWT, and the subdomain must
+/// be owned by the user making the request. This will be checked by the server.
+#[utoipa::path(
+    get,
+    tag = "Origins Management and Dynamic Access Control",
+    operation_id = "Get all origins",
+    path = "/api/origin",
+    params(
+        ("x-subdomain" = String, 
+        Header,
+        description = "'x-subdomain' header represents the name of the subdomain on which the action is to be performed."),
+    ),
+    responses(
+        (status = 201, description = "Origins were successfully retrieved for subdomain.",                                  body = ListOriginsResponse),
+        (status = 400, description = "The 'x-subdomain' header is missing or contains invalid characters.",                 body = Details),
+        (status = 401, description = "Unauthorized: The JWT in the header is invalid or expired.",                          body = Details),
+        (status = 403, description = "Forbidden: The subdomain is owned by another user.",                                  body = Details),
+        (status = 404, description = "Not Found: The login or subdomain was not found. See details for more information.",  body = Details),
+        (status = 500, description = "Internal Server Error: An error occurred on the server.",                             body = Details),
+    ),
+    security(("Bearer-JWT" = []))
+)]
+#[tracing::instrument(skip(state))]
+pub async fn implementation(
+    State(state): State<Arc<AppState>>,
+    SubdomainOwned { user, subdomain }: SubdomainOwned,
+) -> Result<impl IntoResponse, ListOriginsError> {
+    tracing::trace!(
+        %subdomain.name,
+        %subdomain.id,
+        %user.id,
+        "Retrieving origins list for subdomain...",
+    );
+
+    let origins = CorsService::retrieve_origins_for(subdomain.id, state.connection()).await?;
+
+    tracing::trace!(
+        %subdomain.name,
+        %subdomain.id,
+        %user.id,
+        amount = origins.len(),
+        "Origins list was successfully retrieved!",
+    );
+
+    Ok(Json(ListOriginsResponse { origins }))
+}

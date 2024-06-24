@@ -1,0 +1,108 @@
+name: "Test"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "**" # matches every branch
+
+jobs:
+  check:
+    name: "Run cargo check"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Check out the repo"
+        uses: actions/checkout@v3
+
+      - uses: "actions-rs/toolchain@v1"
+        with:
+          profile: "minimal"
+          toolchain: "stable"
+          override: true
+
+      - uses: "actions-rs/cargo@v1"
+        with:
+          command: "check"
+
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: "Get version from Cargo.toml"
+        id: "get-cargo-version"
+        shell: "bash"
+        run: |
+          echo PKG_VERSION=$(awk -F ' = ' '$1 ~ /version/ { gsub(/["]/, "", $2); printf("%s",$2) }' Cargo.toml) >> $GITHUB_OUTPUT
+      - name: Get version from openapi.json
+        id: get-openapi-version
+        run: |
+          echo OAPI_VERSION=$(jq -r '.info.version' openapi.json) >> $GITHUB_OUTPUT
+
+      - name: Compare versions
+        run: |
+          if [ "${{ steps.get-cargo-version.outputs.PKG_VERSION }}" != "${{ steps.get-openapi-version.outputs.OAPI_VERSION }}" ]; then
+            echo "Version mismatch between cargo.toml and generated OpenAPI JSON."
+            exit 1
+          else
+            echo "Version matches between cargo.toml and generated OpenAPI JSON."
+          fi
+      - name: Run tests (with database service)
+        run: cargo test --verbose -- --test-threads=1
+
+  fmt:
+    name: "Run cargo fmt"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Check out the repo"
+        uses: actions/checkout@v3
+
+      - uses: "actions-rs/toolchain@v1"
+        with:
+          profile: "minimal"
+          toolchain: "stable"
+          override: true
+
+      - run: "rustup component add rustfmt"
+
+      - uses: "actions-rs/cargo@v1"
+        with:
+          command: "+nightly fmt"
+          args: "--all -- --check"
+
+  clippy:
+    name: "Run cargo clippy"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Check out the repo"
+        uses: actions/checkout@v3
+
+      - uses: "actions-rs/toolchain@v1"
+        with:
+          profile: "minimal"
+          toolchain: "stable"
+          override: true
+
+      - run: "rustup component add clippy"
+
+      - uses: "actions-rs/cargo@v1"
+        with:
+          command: "clippy"
+          args: "-- -D warnings"

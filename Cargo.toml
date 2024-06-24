@@ -1,6 +1,6 @@
 [package]
 name = "sero"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["clowzed <clowzed.work@gmail.com>"]
 description = "Muiltidomain static site hosting"
@@ -9,48 +9,73 @@ readme = "readme.md"
 license = "MIT"
 
 [dependencies]
-axum = { version = "0.6.20", features = ["macros", "tracing", "headers", "multipart"] }
 envy = "0.4.2"
-sea-orm = { version = "0.12.3", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
+sea-orm = { version = "0.12.3", features = [
+	"sqlx-postgres",
+	"runtime-tokio-rustls",
+	"macros",
+] }
 tokio = { version = "1.32.0", features = ["full"] }
 tokio-postgres = "0.7.10"
-tracing = "0.1.37"
-tracing-subscriber = { version = "0.3.17", features = ["env-filter", "fmt", "ansi", "std", "json"] }
+tracing = { version = "0.1.37", features = ["async-await"] }
+tracing-subscriber = { version = "0.3.17", features = [
+	"env-filter",
+	"fmt",
+	"ansi",
+	"std",
+	"json",
+] }
 entity = { path = "entity" }
 migration = { path = "migration" }
 serde = { version = "1.0.188", features = ["derive"] }
-jsonwebtoken = "8.3.0"
-axum-extra = { version = "0.8.0", features = ["cookie"] }
-sha256 = "1.4.0"
+jsonwebtoken = "9.2.0"
 thiserror = "1.0.49"
 chrono = "0.4.31"
-futures-util = "0.3.28"
-axum_typed_multipart = "0.10.0"
 uuid = { version = "1.4.1", features = ["v4"] }
-async_zip = { version = "0.0.15", features = ["tokio-fs", "tokio", "full"] }
+async_zip = { version = "0.0.17", features = ["full"] }
 bytes = "1.5.0"
 async-trait = "0.1.73"
-tokio-util = { version = "0.7.9", features = ["io"] }
-dotenv = "0.15.0"
-tower-http = { version = "0.4.4", features = ["cors"] }
 futures = "0.3.29"
-tower = { version = "0.4.13", features = ["util"] }
-serde_urlencoded = "0.7.1"
 serde_json = "1.0.108"
 mime = "0.3.17"
-axum-test-helper = "0.3.0"
-hyper = "0.14.27"
-reqwest = { version = "0.11.22", features = ["json", "multipart"] }
-oneshot = "0.1.6"
-crossfire = "1.0.1"
-http-body = "0.4.5"
 mime_guess = "2.0.4"
+argon2 = { version = "0.5.3", features = ["std"] }
+utoipa = { version = "4.2.0", features = [
+	"axum_extras",
+	"chrono",
+	"preserve_order",
+] }
+dotenvy = "0.15.7"
+toml = "0.8.8"
+tokio-util = { version = "0.7.10", features = ["io"] }
+utoipa-rapidoc = { version = "4.0.0", features = ["axum"] }
+utoipa-redoc = { version = "4.0.0", features = ["axum"] }
+utoipa-swagger-ui = { version = "7.1.0", features = ["axum"] }
+axum = { version = "0.7.4", features = [
+	"macros",
+	"tracing",
+	"json",
+	"multipart",
+] }
+axum_typed_multipart = "0.11.0"
+tower-http = { git = "https://github.com/tower-rs/tower-http.git", features = [
+	"cors",
+	"trace",
+	"timeout",
+] }
+tower = { version = "0.4.13", features = ["util"] }
+hyper = "0.14.28"
+utoipauto = "0.1.10"
+validator = { version = "0.18.0", features = ["derive"] }
+axum-valid = "0.18.0"
+sea-query = "0.30.7"
+serde_with = "3.8.1"
+tracing-appender = "0.2.3"
 
 [workspace]
 members = [".", "entity", "migration"]
 
-[profile.release]
-lto = true
-strip = true
-opt-level = 3
-codegen-units = 1
+
+[dev-dependencies]
+
+axum-test = "15.2.0"

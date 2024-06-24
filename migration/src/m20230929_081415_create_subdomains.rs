@@ -13,34 +13,36 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(
                         ColumnDef::new(Subdomain::Id)
-                            .integer()
+                            .big_integer()
                             .not_null()
                             .auto_increment()
                             .primary_key(),
                     )
-                    .col(ColumnDef::new(Subdomain::OwnerId).integer().not_null())
+                    .col(ColumnDef::new(Subdomain::OwnerId).big_integer().not_null())
                     .foreign_key(
                         ForeignKey::create()
                             .name("FK_user_subdomain")
                             .from(Subdomain::Table, Subdomain::OwnerId)
-                            .to(User::Table, User::Id),
+                            .to(User::Table, User::Id)
+                            .on_delete(ForeignKeyAction::Cascade),
                     )
-                    .col(
-                        ColumnDef::new(Subdomain::Enabled)
-                            .boolean()
-                            .not_null()
-                            .default(true),
-                    )
-                    .col(
-                        ColumnDef::new(Subdomain::Name)
-                            .string()
-                            .not_null()
-                            .unique_key(),
-                    )
+                    .col(ColumnDef::new(Subdomain::Enabled).boolean().not_null().default(true))
+                    .col(ColumnDef::new(Subdomain::Name).string().not_null().unique_key())
                     .col(ColumnDef::new(Subdomain::ArchivePath).string().unique_key())
                     .to_owned(),
             )
-            .await
+            .await?;
+        manager
+            .create_index(
+                Index::create()
+                    .unique()
+                    .name("subdomain-name-idx")
+                    .table(Subdomain::Table)
+                    .col(Subdomain::Name)
+                    .to_owned(),
+            )
+            .await?;
+        Ok(())
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {

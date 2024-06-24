@@ -1,3 +1,6 @@
 /target
 Cargo.lock
-[0-9a-zA-Z]*-[0-9a-zA-Z]*-[0-9a-zA-Z]*-[0-9a-zA-Z]*-[0-9a-zA-Z]*
+sites-uploads
+logs
+test_upload_files
+.env

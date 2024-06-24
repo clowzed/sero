@@ -1,0 +1,69 @@
+[tasks.start-postgres]
+command = "sudo"
+args = [
+    "docker",
+    "run",
+    "--name",
+    "postgres-test",
+    "-d",
+    "-e",
+    "POSTGRES_PASSWORD=postgres",
+    "-e",
+    "POSTGRES_USER=postgres",
+    "-e",
+    "POSTGRES_DB=postgres",
+    "-p",
+    "5432:5432",
+    "--health-cmd=pg_isready",
+    "--health-interval=10s",
+    "--health-timeout=5s",
+    "--health-retries=5",
+    "postgres:16",
+]
+
+[tasks.stop-postgres]
+script = ['''
+    sudo docker stop postgres-test || echo "Postgres container not running"
+    ''']
+
+[tasks.remove-postgres]
+script = ['''
+    sudo docker rm -v postgres-test || echo "Postgres container not found"
+    ''']
+
+
+[tasks.wait-for-postgres]
+script = ['''
+    while ! sudo docker exec postgres-test pg_isready -U postgres; do
+      echo "Waiting for postgres to be ready..."
+      sleep 2
+    done
+    echo "Postgres is ready!"
+    ''']
+
+[tasks.run-tests]
+env = { "RUST_BACKTRACE" = "0" }
+command = "cargo"
+args = ["test", "--", "--test-threads=1", "--nocapture", "--show-output"]
+
+[tasks.cleanup]
+script = [
+    '''
+    sudo docker stop postgres-test && sudo docker rm -v postgres-test|| echo "Postgres container not found"
+    ''',
+]
+
+[tasks.flow]
+dependencies = [
+    "cleanup",
+    "start-postgres",
+    "wait-for-postgres",
+    "run-tests",
+    "cleanup",
+]
+
+[config]
+skip_core_tasks = true
+
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true

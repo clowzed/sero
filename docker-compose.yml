@@ -2,7 +2,7 @@ version: "3"
 
 services:
   database:
-    image: postgres:15
+    image: postgres:16
     user: postgres
     restart: always
     environment:
@@ -20,7 +20,7 @@ services:
 
 
   proxy:
-    image: nginx
+    image: nginx:alpine3.18-slim
     restart: always
     environment:
       - DOLLAR=$
@@ -37,6 +37,8 @@ services:
       - 80:80
     links:
       - server
+    profiles:
+      - donotstart
 
   server:
     image: clowzed/sero
@@ -46,7 +48,9 @@ services:
       database:
         condition: service_healthy
     volumes:
-      - server-files:/app
+      - server-files:/app/sites-uploads
+    ports:
+      - 8080:8080
     environment:
        - DATABASE_URL=postgresql://postgres:1234@database/sero
        - PORT=8080
@@ -54,9 +58,14 @@ services:
        # Empty means no limits
        - MAX_USERS=1
        - MAX_SITES_PER_USER=100
-       - MAX_BODY_LIMIT_BYTES=10000000
+       - MAX_BODY_LIMIT_SIZE=10000000 # 10mb
        - RUST_LOG=none,sero=trace
        # end of section
+       - JWT_SECRET=mysuperstrongjwtscret
+       - JWT_TTL_SECONDS=120
+       - SQLX_LOGGING=true
+       - UPLOAD_FOLDER=./sites-uploads
+
 
 volumes:
   server-files:

@@ -6,3 +6,12 @@ readme.md
 logo.svg
 .github
 nginx-templates
+assets/
+rustfmt.toml
+openapi.json
+logs
+sero-docs
+scripts
+.env
+.env.tests
+CODE_OF_CONDUCT.md
