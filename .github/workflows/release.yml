@@ -80,7 +80,6 @@ jobs:
     needs:
       - "get-tag"
       - "upload-assets"
-      - "publish-api"
     runs-on: "ubuntu-latest"
     steps:
       - name: "Check out the repo"
