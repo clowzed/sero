@@ -84,7 +84,7 @@ jobs:
 
       - uses: "actions-rs/cargo@v1"
         with:
-          command: "+nightly fmt"
+          command: "fmt"
           args: "--all -- --check"
 
   clippy:

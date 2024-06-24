@@ -10,7 +10,7 @@
 		"license": {
 			"name": "MIT"
 		},
-		"version": "0.2.2"
+		"version": "0.2.3"
 	},
 	"paths": {
 		"/api/auth/login": {
