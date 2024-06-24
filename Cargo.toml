@@ -1,6 +1,6 @@
 [package]
 name = "sero"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 authors = ["clowzed <clowzed.work@gmail.com>"]
 description = "Muiltidomain static site hosting"
