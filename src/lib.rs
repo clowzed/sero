@@ -11,7 +11,8 @@ use configuration::{reader::ConfigurationReader, *};
 use futures::StreamExt;
 use migration::{Migrator, MigratorTrait};
 use origin::service::Service as CorsService;
-use sea_orm::{ConnectOptions, Database, DbErr};
+use sea_orm::ActiveModelTrait;
+use sea_orm::{ConnectOptions, Database, DbErr, IntoActiveModel};
 use serde::{Deserialize, Serialize};
 use services::*;
 use site::service::Service as SiteService;
@@ -165,6 +166,15 @@ pub async fn app() -> Result<(Router, Arc<State>), AppCreationError> {
                                 |cause| tracing::warn!(%cause, "Failed to remove file with path : {}", file.real_path),
                             )
                             .ok();
+
+                        let file_id = file.id;
+                        file.into_active_model()
+                            .delete(state_for_file_deletion_task.connection())
+                            .await
+                            .inspect_err(
+                                |cause| tracing::warn!(%cause, %file_id, "Failed to remove file from database"),
+                            )
+                            .ok();
                     }
                 }
             }
@@ -197,6 +207,12 @@ pub async fn app() -> Result<(Router, Arc<State>), AppCreationError> {
             };
 
             async move {
+                //? If header was not provided
+                //? Allow as it probably management tool
+                if task.subdomain.is_empty() {
+                    return true;
+                }
+
                 if cors_task_sender
                     .send(task)
                     .await

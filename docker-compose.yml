@@ -4,7 +4,6 @@ services:
   database:
     image: postgres:16
     user: postgres
-    restart: always
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=sero
@@ -21,7 +20,6 @@ services:
 
   proxy:
     image: nginx:alpine3.18-slim
-    restart: always
     environment:
       - DOLLAR=$
       - SERVER_PORT=8080
@@ -37,12 +35,9 @@ services:
       - 80:80
     links:
       - server
-    profiles:
-      - donotstart
 
   server:
     image: clowzed/sero
-    restart: always
     build: .
     depends_on:
       database:
@@ -60,8 +55,8 @@ services:
        - MAX_SITES_PER_USER=100
        - MAX_BODY_LIMIT_SIZE=10000000 # 10mb
        - RUST_LOG=none,sero=trace
-       # end of section
        - JWT_SECRET=mysuperstrongjwtscret
+       # end of section
        - JWT_TTL_SECONDS=120
        - SQLX_LOGGING=true
        - UPLOAD_FOLDER=./sites-uploads

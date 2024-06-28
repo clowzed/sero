@@ -1,18 +1,10 @@
 server {
-
-
-   # We check if $subdomain is not empty and if the X-subdomain header is not present in the request 
-   # ($http_x_subdomain = ""). 
-   # If both conditions are met, we set the X-subdomain header using proxy_set_header. 
-   # Otherwise, we do nothing, and the existing X-subdomain header (if any) will be preserved.
-
     listen 80;
     server_name ~^(?<subdomain>\w*)\.${DOMAIN}.${ZONE}${DOLLAR};
 
     location / {
-        if ($subdomain != "" && $http_x_subdomain = "") {
-            proxy_set_header x-subdomain $subdomain;
-        }
+        # Always set the X-subdomain header with the value from the subdomain in the URL
+        proxy_set_header x-subdomain $subdomain;
         proxy_pass http://${SERVER}:${SERVER_PORT}/;
     }
 }
