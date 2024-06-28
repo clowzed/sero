@@ -1,1219 +1,1219 @@
 {
-    "openapi": "3.0.3",
-    "info": {
-        "title": "sero",
-        "description": "Muiltidomain static site hosting",
-        "contact": {
-            "name": "clowzed",
-            "email": "clowzed.work@gmail.com"
-        },
-        "license": {
-            "name": "MIT"
-        },
-        "version": "0.2.4"
-    },
-    "paths": {
-        "/api/auth/login": {
-            "post": {
-                "tags": [
-                    "Account management"
-                ],
-                "summary": "Login user and receive JWT token.",
-                "description": "This endpoint allows users to login to sero server. The TTL for token is set by\nthe owner of the server by `JWT_TTL` env.",
-                "operationId": "Login",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/LoginRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "User was successfully authenticated.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/LoginResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request or bad credentials. See details.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Login was not found.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Some error occurred on the server.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/auth/registration": {
-            "post": {
-                "tags": [
-                    "Account management"
-                ],
-                "summary": "Register new user for sero server.",
-                "description": "This endpoint creates new user for sero server. The amount of users is checked\nby [RegistrationGuard]. The amount of allowed users is determined by `MAX_USERS` env.",
-                "operationId": "Registration",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/RegistrationRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "User was successfully registered.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/RegistrationResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request or bad credentials. See details.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "409": {
-                        "description": "Login has already been registered.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Some error occurred on the server.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/origin": {
-            "get": {
-                "tags": [
-                    "Origins Management and Dynamic Access Control"
-                ],
-                "summary": "List all origins for specified subdomain for dynamic CORS (Cross-Origin Resource Sharing) management.",
-                "description": "This endpoint allows users to list all origins that are permitted to access resources\non their specified subdomains. The action is authenticated using a JWT, and the subdomain must\nbe owned by the user making the request. This will be checked by the server.",
-                "operationId": "Get all origins",
-                "parameters": [
-                    {
-                        "name": "x-subdomain",
-                        "in": "header",
-                        "description": "'x-subdomain' header represents the name of the subdomain on which the action is to be performed.",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Origins were successfully retrieved for subdomain.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ListOriginsResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "The 'x-subdomain' header is missing or contains invalid characters.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized: The JWT in the header is invalid or expired.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden: The subdomain is owned by another user.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found: The login or subdomain was not found. See details for more information.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error: An error occurred on the server.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer-JWT": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Origins Management and Dynamic Access Control"
-                ],
-                "summary": "Adds a new origin to a specified subdomain for dynamic CORS (Cross-Origin Resource Sharing) management.",
-                "description": "This endpoint allows users to add origins that are permitted to access resources\non their specified subdomains. The action is authenticated using a JWT, and the subdomain must\nbe owned by the user making the request. This will be checked by the server.",
-                "operationId": "Create origin",
-                "parameters": [
-                    {
-                        "name": "x-subdomain",
-                        "in": "header",
-                        "description": "'x-subdomain' header represents the name of the subdomain on which the action is to be performed.",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/AddOriginRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "description": "The origin was successfully added.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AddOriginResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "The 'x-subdomain' header is missing or contains invalid characters.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized: The JWT in the header is invalid or expired.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden: The subdomain is owned by another user.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found: The login or subdomain was not found. See details for more information.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error: An error occurred on the server.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer-JWT": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Origins Management and Dynamic Access Control"
-                ],
-                "summary": "Delete all origins for specified subdomain for dynamic CORS (Cross-Origin Resource Sharing) management.",
-                "description": "This endpoint allows users to delete all origins that are permitted to access resources\non their specified subdomains. The action is authenticated using a JWT, and the subdomain must\nbe owned by the user making the request. This will be checked by the server.",
-                "operationId": "Delete all origins",
-                "parameters": [
-                    {
-                        "name": "x-subdomain",
-                        "in": "header",
-                        "description": "'x-subdomain' header represents the name of the subdomain on which the action is to be performed.",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Origins were successfully deleted for subdomain."
-                    },
-                    "400": {
-                        "description": "The 'x-subdomain' header is missing or contains invalid characters.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized: The JWT in the header is invalid or expired.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden: The subdomain is owned by another user.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found: The login or subdomain was not found. See details for more information.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error: An error occurred on the server.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer-JWT": []
-                    }
-                ]
-            }
-        },
-        "/api/origin/{id}": {
-            "get": {
-                "tags": [
-                    "Origins Management and Dynamic Access Control"
-                ],
-                "summary": "Get specified origin [by id] for specified subdomain for dynamic CORS (Cross-Origin Resource Sharing) management.",
-                "description": "This endpoint allows users to get specified origin by id that is permitted to access resources\non specified subdomain. The action is authenticated using a JWT, and the subdomain must\nbe owned by the user making the request. This will be checked by the server.",
-                "operationId": "Get origin by id",
-                "parameters": [
-                    {
-                        "name": "x-subdomain",
-                        "in": "header",
-                        "description": "'x-subdomain' header represents the name of the subdomain on which the action is to be performed.",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Id of the origin to retrieve",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Origin was successfully retrieved.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/GetOriginResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "The 'x-subdomain' header is missing or contains invalid characters.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized: The JWT in the header is invalid or expired.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden: The subdomain is owned by another user.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found: The login or subdomain or origin was not found. See details for more information.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error: An error occurred on the server.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer-JWT": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Origins Management and Dynamic Access Control"
-                ],
-                "summary": "Delete origin by id for specified subdomain for dynamic CORS (Cross-Origin Resource Sharing) management.",
-                "description": "This endpoint allows users to delete origin by id that is permitted to access resources\non their specified subdomains. The action is authenticated using a JWT, and the subdomain must\nbe owned by the user making the request. This will be checked by the server.",
-                "operationId": "Delete origin by id",
-                "parameters": [
-                    {
-                        "name": "x-subdomain",
-                        "in": "header",
-                        "description": "'x-subdomain' header represents the name of the subdomain on which the action is to be performed.",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Id of the origin to delete",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Origin was successfully deleted for subdomain."
-                    },
-                    "400": {
-                        "description": "The 'x-subdomain' header is missing or contains invalid characters.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized: The JWT in the header is invalid or expired.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden: The origin is owned by another user.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found: The login or subdomain or origin was not found. See details for more information.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error: An error occurred on the server.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer-JWT": []
-                    }
-                ]
-            }
-        },
-        "/api/site": {
-            "get": {
-                "tags": [
-                    "Actions"
-                ],
-                "summary": "Download site of the specified subdomain.",
-                "description": "Returns a zip file which was uploaded by user (last)",
-                "operationId": "Download site",
-                "parameters": [
-                    {
-                        "name": "x-subdomain",
-                        "in": "header",
-                        "description": "x-subdomain header represents name of subdomain to call action on",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Site was successfully downloaded",
-                        "content": {
-                            "application/octet-stream": {
-                                "schema": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "The 'x-subdomain' header is missing or contains invalid characters.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized: The JWT in the header is invalid or expired.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden: The subdomain is owned by another user.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found: The login or subdomain was not found. See details for more information.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error: An error occurred on the server.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer-JWT": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Actions"
-                ],
-                "summary": "Uploads site for a specified subdomain.",
-                "description": "Warning: Old files will be removed after successful upload.\nThe cleanup task is configured with `CLEAN_OBSOLETE_INTERVAL` env\nIf upload fails then old files will be preserved.\nIf upload fails on th stage of extracting zips then\nnew subdomain will be associated with user\n\nUpload guard checks amount of uploads available for user.\nThe guard is configured with `MAX_SITES_PER_USER` env.",
-                "operationId": "Upload site",
-                "parameters": [
-                    {
-                        "name": "x-subdomain",
-                        "in": "header",
-                        "description": "x-subdomain header represents name of subdomain to call action on",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UploadData"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "204": {
-                        "description": "Site was successfully uploaded"
-                    },
-                    "400": {
-                        "description": "The 'x-subdomain' header is missing or contains invalid characters.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized: The JWT in the header is invalid or expired.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden: The subdomain is owned by another user.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found: The login or subdomain was not found. See details for more information.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error: An error occurred on the server.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer-JWT": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Actions"
-                ],
-                "summary": "Removes a specific site identified by the `x-subdomain` header.",
-                "description": "This endpoint allows authenticated users to remove a site associated with the specified subdomain.\nThe subdomain to be removed is specified in the `x-subdomain` header.",
-                "operationId": "Teardown site",
-                "parameters": [
-                    {
-                        "name": "x-subdomain",
-                        "in": "header",
-                        "description": "x-subdomain header represents name of subdomain to call action on",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Site was successfully removed."
-                    },
-                    "400": {
-                        "description": "The 'x-subdomain' header is missing or contains invalid characters.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized: The JWT in the header is invalid or expired.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden: The subdomain is owned by another user.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found: The login or subdomain was not found. See details for more information.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error: An error occurred on the server.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer-JWT": []
-                    }
-                ]
-            }
-        },
-        "/api/site/disable": {
-            "patch": {
-                "tags": [
-                    "Actions"
-                ],
-                "summary": "Disables a specific site identified by the `x-subdomain` header.",
-                "description": "This endpoint allows authenticated users to disable a site associated with the specified subdomain.",
-                "operationId": "Disable site",
-                "parameters": [
-                    {
-                        "name": "x-subdomain",
-                        "in": "header",
-                        "description": "x-subdomain header represents name of subdomain to call action on",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Site was successfully disabled."
-                    },
-                    "400": {
-                        "description": "The 'x-subdomain' header is missing or contains invalid characters.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized: The JWT in the header is invalid or expired.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden: The subdomain is owned by another user.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found: The login or subdomain was not found. See details for more information.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error: An error occurred on the server.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer-JWT": []
-                    }
-                ]
-            }
-        },
-        "/api/site/enable": {
-            "patch": {
-                "tags": [
-                    "Actions"
-                ],
-                "summary": "Enables a specific site identified by the `x-subdomain` header.",
-                "description": "This endpoint allows authenticated users to enable a site associated with the specified subdomain.",
-                "operationId": "Enable site",
-                "parameters": [
-                    {
-                        "name": "x-subdomain",
-                        "in": "header",
-                        "description": "x-subdomain header represents name of subdomain to call action on",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Site was successfully enabled"
-                    },
-                    "400": {
-                        "description": "The 'x-subdomain' header is missing or contains invalid characters.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized: The JWT in the header is invalid or expired.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden: The subdomain is owned by another user.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found: The login or subdomain was not found. See details for more information.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error: An error occurred on the server.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Details"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer-JWT": []
-                    }
-                ]
-            }
-        }
-    },
-    "components": {
-        "schemas": {
-            "AddOriginRequest": {
-                "type": "object",
-                "required": [
-                    "origin"
-                ],
-                "properties": {
-                    "origin": {
-                        "type": "string",
-                        "description": "Origin to be added"
-                    }
-                },
-                "example": {
-                    "origin": "https://example.com/"
-                }
-            },
-            "AddOriginResponse": {
-                "type": "object",
-                "required": [
-                    "id",
-                    "origin"
-                ],
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "format": "int64",
-                        "description": "Automatically generated id for new origin\nThis can be used for further management"
-                    },
-                    "origin": {
-                        "type": "string",
-                        "description": "This duplicates origin from response payload\nto match REST specification"
-                    }
-                },
-                "example": {
-                    "id": "42",
-                    "origin": "https://example.com/"
-                }
-            },
-            "Details": {
-                "type": "object",
-                "description": "This struct is a response of server in bad situation\nThat can be INTERNAL SERVER ERROR or BAD REQUEST\nYou can find all information in reason field",
-                "required": [
-                    "reason"
-                ],
-                "properties": {
-                    "reason": {
-                        "type": "string",
-                        "description": "This field will contain error information"
-                    }
-                }
-            },
-            "GetOriginResponse": {
-                "type": "object",
-                "required": [
-                    "origin"
-                ],
-                "properties": {
-                    "origin": {
-                        "$ref": "#/components/schemas/OriginModel"
-                    }
-                },
-                "example": {
-                    "origin": {
-                        "id": 42,
-                        "subdomain_id": 1,
-                        "value": "https://example.com"
-                    }
-                }
-            },
-            "ListOriginsResponse": {
-                "type": "object",
-                "required": [
-                    "origins"
-                ],
-                "properties": {
-                    "origins": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/OriginModel"
-                        },
-                        "description": "List of retrieved origins"
-                    }
-                },
-                "example": {
-                    "origins": [
-                        {
-                            "id": 42,
-                            "subdomain_id": 1,
-                            "value": "https://example.com"
-                        }
-                    ]
-                }
-            },
-            "LoginRequest": {
-                "type": "object",
-                "required": [
-                    "login",
-                    "password"
-                ],
-                "properties": {
-                    "login": {
-                        "type": "string",
-                        "description": "The username used for authentication.\nIt must adhere to the following criteria:\n- It can contain letters (a-z), numbers (0-9), and periods (.).\n- It cannot contain any of the following characters: & =  ' - + , < >\n- It cannot have multiple periods (.) consecutively.\n- Minimum length of 5 characters.\n- Maximum length of 40 characters.",
-                        "maxLength": 40,
-                        "minLength": 5
-                    },
-                    "password": {
-                        "type": "string",
-                        "description": "The password used for authentication.\nIt must meet the following requirements:\n- Minimum length of 12 characters.\n- Maximum length of 40 characters.\n- A combination of letters, numbers, and symbols.",
-                        "maxLength": 40,
-                        "minLength": 12
-                    }
-                }
-            },
-            "LoginResponse": {
-                "type": "object",
-                "description": "The JWT token generated for authentication purposes.",
-                "required": [
-                    "token"
-                ],
-                "properties": {
-                    "token": {
-                        "type": "string",
-                        "description": "Token in JWT format"
-                    }
-                },
-                "example": {
-                    "token": "ferwfwerfwer.fwerfwerfwerfwer.fwerfewfr"
-                }
-            },
-            "OriginModel": {
-                "type": "object",
-                "required": [
-                    "id",
-                    "subdomain_id",
-                    "value"
-                ],
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "subdomain_id": {
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "value": {
-                        "type": "string"
-                    }
-                }
-            },
-            "RegistrationRequest": {
-                "type": "object",
-                "required": [
-                    "login",
-                    "password"
-                ],
-                "properties": {
-                    "login": {
-                        "type": "string",
-                        "description": "The username used for authentication.\nIt must adhere to the following criteria:\n- It can contain letters (a-z), numbers (0-9), and periods (.).\n- It cannot contain any of the following characters: & =  ' - + , < >\n- It cannot have multiple periods (.) consecutively.\n- Minimum length of 5 characters.\n- Maximum length of 40 characters.",
-                        "maxLength": 40,
-                        "minLength": 5
-                    },
-                    "password": {
-                        "type": "string",
-                        "description": "The password used for authentication.\nIt must meet the following requirements:\n- Minimum length of 12 characters.\n- Maximum length of 40 characters.\n- A combination of letters, numbers, and symbols.",
-                        "maxLength": 40,
-                        "minLength": 12
-                    }
-                }
-            },
-            "RegistrationResponse": {
-                "type": "object",
-                "required": [
-                    "id"
-                ],
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "format": "int64",
-                        "description": "Auto generated id of a registered user"
-                    }
-                },
-                "example": {
-                    "id": 1293983717
-                }
-            },
-            "UploadData": {
-                "type": "object",
-                "required": [
-                    "archive"
-                ],
-                "properties": {
-                    "archive": {
-                        "type": "string",
-                        "format": "binary"
-                    }
-                }
-            }
-        },
-        "securitySchemes": {
-            "Bearer-JWT": {
-                "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT"
-            }
-        }
-    }
+	"openapi": "3.0.3",
+	"info": {
+		"title": "sero",
+		"description": "Muiltidomain static site hosting",
+		"contact": {
+			"name": "clowzed",
+			"email": "clowzed.work@gmail.com"
+		},
+		"license": {
+			"name": "MIT"
+		},
+		"version": "0.2.5"
+	},
+	"paths": {
+		"/api/auth/login": {
+			"post": {
+				"tags": [
+					"Account management"
+				],
+				"summary": "Login user and receive JWT token.",
+				"description": "This endpoint allows users to login to sero server. The TTL for token is set by\nthe owner of the server by `JWT_TTL` env.",
+				"operationId": "Login",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/LoginRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "User was successfully authenticated.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LoginResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request or bad credentials. See details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Login was not found.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Some error occurred on the server.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/auth/registration": {
+			"post": {
+				"tags": [
+					"Account management"
+				],
+				"summary": "Register new user for sero server.",
+				"description": "This endpoint creates new user for sero server. The amount of users is checked\nby [RegistrationGuard]. The amount of allowed users is determined by `MAX_USERS` env.",
+				"operationId": "Registration",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/RegistrationRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "User was successfully registered.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RegistrationResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request or bad credentials. See details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"409": {
+						"description": "Login has already been registered.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Some error occurred on the server.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/origin": {
+			"get": {
+				"tags": [
+					"Origins Management and Dynamic Access Control"
+				],
+				"summary": "List all origins for specified subdomain for dynamic CORS (Cross-Origin Resource Sharing) management.",
+				"description": "This endpoint allows users to list all origins that are permitted to access resources\non their specified subdomains. The action is authenticated using a JWT, and the subdomain must\nbe owned by the user making the request. This will be checked by the server.",
+				"operationId": "Get all origins",
+				"parameters": [
+					{
+						"name": "x-subdomain",
+						"in": "header",
+						"description": "'x-subdomain' header represents the name of the subdomain on which the action is to be performed.",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"201": {
+						"description": "Origins were successfully retrieved for subdomain.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ListOriginsResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The 'x-subdomain' header is missing or contains invalid characters.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized: The JWT in the header is invalid or expired.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden: The subdomain is owned by another user.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found: The login or subdomain was not found. See details for more information.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error: An error occurred on the server.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"Bearer-JWT": []
+					}
+				]
+			},
+			"post": {
+				"tags": [
+					"Origins Management and Dynamic Access Control"
+				],
+				"summary": "Adds a new origin to a specified subdomain for dynamic CORS (Cross-Origin Resource Sharing) management.",
+				"description": "This endpoint allows users to add origins that are permitted to access resources\non their specified subdomains. The action is authenticated using a JWT, and the subdomain must\nbe owned by the user making the request. This will be checked by the server.",
+				"operationId": "Create origin",
+				"parameters": [
+					{
+						"name": "x-subdomain",
+						"in": "header",
+						"description": "'x-subdomain' header represents the name of the subdomain on which the action is to be performed.",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AddOriginRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "The origin was successfully added.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AddOriginResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The 'x-subdomain' header is missing or contains invalid characters.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized: The JWT in the header is invalid or expired.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden: The subdomain is owned by another user.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found: The login or subdomain was not found. See details for more information.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error: An error occurred on the server.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"Bearer-JWT": []
+					}
+				]
+			},
+			"delete": {
+				"tags": [
+					"Origins Management and Dynamic Access Control"
+				],
+				"summary": "Delete all origins for specified subdomain for dynamic CORS (Cross-Origin Resource Sharing) management.",
+				"description": "This endpoint allows users to delete all origins that are permitted to access resources\non their specified subdomains. The action is authenticated using a JWT, and the subdomain must\nbe owned by the user making the request. This will be checked by the server.",
+				"operationId": "Delete all origins",
+				"parameters": [
+					{
+						"name": "x-subdomain",
+						"in": "header",
+						"description": "'x-subdomain' header represents the name of the subdomain on which the action is to be performed.",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Origins were successfully deleted for subdomain."
+					},
+					"400": {
+						"description": "The 'x-subdomain' header is missing or contains invalid characters.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized: The JWT in the header is invalid or expired.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden: The subdomain is owned by another user.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found: The login or subdomain was not found. See details for more information.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error: An error occurred on the server.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"Bearer-JWT": []
+					}
+				]
+			}
+		},
+		"/api/origin/{id}": {
+			"get": {
+				"tags": [
+					"Origins Management and Dynamic Access Control"
+				],
+				"summary": "Get specified origin [by id] for specified subdomain for dynamic CORS (Cross-Origin Resource Sharing) management.",
+				"description": "This endpoint allows users to get specified origin by id that is permitted to access resources\non specified subdomain. The action is authenticated using a JWT, and the subdomain must\nbe owned by the user making the request. This will be checked by the server.",
+				"operationId": "Get origin by id",
+				"parameters": [
+					{
+						"name": "x-subdomain",
+						"in": "header",
+						"description": "'x-subdomain' header represents the name of the subdomain on which the action is to be performed.",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "id",
+						"in": "path",
+						"description": "Id of the origin to retrieve",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Origin was successfully retrieved.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetOriginResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The 'x-subdomain' header is missing or contains invalid characters.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized: The JWT in the header is invalid or expired.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden: The subdomain is owned by another user.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found: The login or subdomain or origin was not found. See details for more information.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error: An error occurred on the server.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"Bearer-JWT": []
+					}
+				]
+			},
+			"delete": {
+				"tags": [
+					"Origins Management and Dynamic Access Control"
+				],
+				"summary": "Delete origin by id for specified subdomain for dynamic CORS (Cross-Origin Resource Sharing) management.",
+				"description": "This endpoint allows users to delete origin by id that is permitted to access resources\non their specified subdomains. The action is authenticated using a JWT, and the subdomain must\nbe owned by the user making the request. This will be checked by the server.",
+				"operationId": "Delete origin by id",
+				"parameters": [
+					{
+						"name": "x-subdomain",
+						"in": "header",
+						"description": "'x-subdomain' header represents the name of the subdomain on which the action is to be performed.",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "id",
+						"in": "path",
+						"description": "Id of the origin to delete",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Origin was successfully deleted for subdomain."
+					},
+					"400": {
+						"description": "The 'x-subdomain' header is missing or contains invalid characters.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized: The JWT in the header is invalid or expired.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden: The origin is owned by another user.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found: The login or subdomain or origin was not found. See details for more information.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error: An error occurred on the server.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"Bearer-JWT": []
+					}
+				]
+			}
+		},
+		"/api/site": {
+			"get": {
+				"tags": [
+					"Actions"
+				],
+				"summary": "Download site of the specified subdomain.",
+				"description": "Returns a zip file which was uploaded by user (last)",
+				"operationId": "Download site",
+				"parameters": [
+					{
+						"name": "x-subdomain",
+						"in": "header",
+						"description": "x-subdomain header represents name of subdomain to call action on",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Site was successfully downloaded",
+						"content": {
+							"application/octet-stream": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The 'x-subdomain' header is missing or contains invalid characters.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized: The JWT in the header is invalid or expired.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden: The subdomain is owned by another user.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found: The login or subdomain was not found. See details for more information.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error: An error occurred on the server.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"Bearer-JWT": []
+					}
+				]
+			},
+			"post": {
+				"tags": [
+					"Actions"
+				],
+				"summary": "Uploads site for a specified subdomain.",
+				"description": "Warning: Old files will be removed after successful upload.\nThe cleanup task is configured with `CLEAN_OBSOLETE_INTERVAL` env\nIf upload fails then old files will be preserved.\nIf upload fails on th stage of extracting zips then\nnew subdomain will be associated with user\n\nUpload guard checks amount of uploads available for user.\nThe guard is configured with `MAX_SITES_PER_USER` env.",
+				"operationId": "Upload site",
+				"parameters": [
+					{
+						"name": "x-subdomain",
+						"in": "header",
+						"description": "x-subdomain header represents name of subdomain to call action on",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"multipart/form-data": {
+							"schema": {
+								"$ref": "#/components/schemas/UploadData"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "Site was successfully uploaded"
+					},
+					"400": {
+						"description": "The 'x-subdomain' header is missing or contains invalid characters.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized: The JWT in the header is invalid or expired.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden: The subdomain is owned by another user.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found: The login or subdomain was not found. See details for more information.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error: An error occurred on the server.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"Bearer-JWT": []
+					}
+				]
+			},
+			"delete": {
+				"tags": [
+					"Actions"
+				],
+				"summary": "Removes a specific site identified by the `x-subdomain` header.",
+				"description": "This endpoint allows authenticated users to remove a site associated with the specified subdomain.\nThe subdomain to be removed is specified in the `x-subdomain` header.",
+				"operationId": "Teardown site",
+				"parameters": [
+					{
+						"name": "x-subdomain",
+						"in": "header",
+						"description": "x-subdomain header represents name of subdomain to call action on",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Site was successfully removed."
+					},
+					"400": {
+						"description": "The 'x-subdomain' header is missing or contains invalid characters.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized: The JWT in the header is invalid or expired.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden: The subdomain is owned by another user.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found: The login or subdomain was not found. See details for more information.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error: An error occurred on the server.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"Bearer-JWT": []
+					}
+				]
+			}
+		},
+		"/api/site/disable": {
+			"patch": {
+				"tags": [
+					"Actions"
+				],
+				"summary": "Disables a specific site identified by the `x-subdomain` header.",
+				"description": "This endpoint allows authenticated users to disable a site associated with the specified subdomain.",
+				"operationId": "Disable site",
+				"parameters": [
+					{
+						"name": "x-subdomain",
+						"in": "header",
+						"description": "x-subdomain header represents name of subdomain to call action on",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Site was successfully disabled."
+					},
+					"400": {
+						"description": "The 'x-subdomain' header is missing or contains invalid characters.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized: The JWT in the header is invalid or expired.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden: The subdomain is owned by another user.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found: The login or subdomain was not found. See details for more information.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error: An error occurred on the server.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"Bearer-JWT": []
+					}
+				]
+			}
+		},
+		"/api/site/enable": {
+			"patch": {
+				"tags": [
+					"Actions"
+				],
+				"summary": "Enables a specific site identified by the `x-subdomain` header.",
+				"description": "This endpoint allows authenticated users to enable a site associated with the specified subdomain.",
+				"operationId": "Enable site",
+				"parameters": [
+					{
+						"name": "x-subdomain",
+						"in": "header",
+						"description": "x-subdomain header represents name of subdomain to call action on",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Site was successfully enabled"
+					},
+					"400": {
+						"description": "The 'x-subdomain' header is missing or contains invalid characters.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized: The JWT in the header is invalid or expired.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden: The subdomain is owned by another user.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found: The login or subdomain was not found. See details for more information.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error: An error occurred on the server.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Details"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"Bearer-JWT": []
+					}
+				]
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"AddOriginRequest": {
+				"type": "object",
+				"required": [
+					"origin"
+				],
+				"properties": {
+					"origin": {
+						"type": "string",
+						"description": "Origin to be added"
+					}
+				},
+				"example": {
+					"origin": "https://example.com/"
+				}
+			},
+			"AddOriginResponse": {
+				"type": "object",
+				"required": [
+					"id",
+					"origin"
+				],
+				"properties": {
+					"id": {
+						"type": "integer",
+						"format": "int64",
+						"description": "Automatically generated id for new origin\nThis can be used for further management"
+					},
+					"origin": {
+						"type": "string",
+						"description": "This duplicates origin from response payload\nto match REST specification"
+					}
+				},
+				"example": {
+					"id": "42",
+					"origin": "https://example.com/"
+				}
+			},
+			"Details": {
+				"type": "object",
+				"description": "This struct is a response of server in bad situation\nThat can be INTERNAL SERVER ERROR or BAD REQUEST\nYou can find all information in reason field",
+				"required": [
+					"reason"
+				],
+				"properties": {
+					"reason": {
+						"type": "string",
+						"description": "This field will contain error information"
+					}
+				}
+			},
+			"GetOriginResponse": {
+				"type": "object",
+				"required": [
+					"origin"
+				],
+				"properties": {
+					"origin": {
+						"$ref": "#/components/schemas/OriginModel"
+					}
+				},
+				"example": {
+					"origin": {
+						"id": 42,
+						"subdomain_id": 1,
+						"value": "https://example.com"
+					}
+				}
+			},
+			"ListOriginsResponse": {
+				"type": "object",
+				"required": [
+					"origins"
+				],
+				"properties": {
+					"origins": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/OriginModel"
+						},
+						"description": "List of retrieved origins"
+					}
+				},
+				"example": {
+					"origins": [
+						{
+							"id": 42,
+							"subdomain_id": 1,
+							"value": "https://example.com"
+						}
+					]
+				}
+			},
+			"LoginRequest": {
+				"type": "object",
+				"required": [
+					"login",
+					"password"
+				],
+				"properties": {
+					"login": {
+						"type": "string",
+						"description": "The username used for authentication.\nIt must adhere to the following criteria:\n- It can contain letters (a-z), numbers (0-9), and periods (.).\n- It cannot contain any of the following characters: & =  ' - + , < >\n- It cannot have multiple periods (.) consecutively.\n- Minimum length of 5 characters.\n- Maximum length of 40 characters.",
+						"maxLength": 40,
+						"minLength": 5
+					},
+					"password": {
+						"type": "string",
+						"description": "The password used for authentication.\nIt must meet the following requirements:\n- Minimum length of 12 characters.\n- Maximum length of 40 characters.\n- A combination of letters, numbers, and symbols.",
+						"maxLength": 40,
+						"minLength": 12
+					}
+				}
+			},
+			"LoginResponse": {
+				"type": "object",
+				"description": "The JWT token generated for authentication purposes.",
+				"required": [
+					"token"
+				],
+				"properties": {
+					"token": {
+						"type": "string",
+						"description": "Token in JWT format"
+					}
+				},
+				"example": {
+					"token": "ferwfwerfwer.fwerfwerfwerfwer.fwerfewfr"
+				}
+			},
+			"OriginModel": {
+				"type": "object",
+				"required": [
+					"id",
+					"subdomain_id",
+					"value"
+				],
+				"properties": {
+					"id": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"subdomain_id": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"value": {
+						"type": "string"
+					}
+				}
+			},
+			"RegistrationRequest": {
+				"type": "object",
+				"required": [
+					"login",
+					"password"
+				],
+				"properties": {
+					"login": {
+						"type": "string",
+						"description": "The username used for authentication.\nIt must adhere to the following criteria:\n- It can contain letters (a-z), numbers (0-9), and periods (.).\n- It cannot contain any of the following characters: & =  ' - + , < >\n- It cannot have multiple periods (.) consecutively.\n- Minimum length of 5 characters.\n- Maximum length of 40 characters.",
+						"maxLength": 40,
+						"minLength": 5
+					},
+					"password": {
+						"type": "string",
+						"description": "The password used for authentication.\nIt must meet the following requirements:\n- Minimum length of 12 characters.\n- Maximum length of 40 characters.\n- A combination of letters, numbers, and symbols.",
+						"maxLength": 40,
+						"minLength": 12
+					}
+				}
+			},
+			"RegistrationResponse": {
+				"type": "object",
+				"required": [
+					"id"
+				],
+				"properties": {
+					"id": {
+						"type": "integer",
+						"format": "int64",
+						"description": "Auto generated id of a registered user"
+					}
+				},
+				"example": {
+					"id": 1293983717
+				}
+			},
+			"UploadData": {
+				"type": "object",
+				"required": [
+					"archive"
+				],
+				"properties": {
+					"archive": {
+						"type": "string",
+						"format": "binary"
+					}
+				}
+			}
+		},
+		"securitySchemes": {
+			"Bearer-JWT": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			}
+		}
+	}
 }
