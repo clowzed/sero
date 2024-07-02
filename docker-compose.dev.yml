@@ -1,0 +1,67 @@
+version: "3"
+
+services:
+  database:
+    image: postgres:16
+    user: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=sero
+      - POSTGRES_PASSWORD=1234
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+
+  proxy:
+    image: nginx:alpine3.18-slim
+    environment:
+      - DOLLAR=$
+      - SERVER_PORT=8080
+      - SERVER=server
+      # Edit this
+      - DOMAIN=
+      - ZONE=
+      # End of edit
+    volumes:
+      - ./nginx-templates:/etc/nginx/templates
+    ports:
+      - 443:443
+      - 80:80
+    links:
+      - server
+
+  server:
+    image: clowzed/sero:dev-unstable
+    build: .
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - server-files:/app/sites-uploads
+    ports:
+      - 8080:8080
+    environment:
+       - DATABASE_URL=postgresql://postgres:1234@database/sero
+       - PORT=8080
+       # You can edit this section
+       # Empty means no limits
+       - MAX_USERS=1
+       - MAX_SITES_PER_USER=100
+       - MAX_BODY_LIMIT_SIZE=10000000 # 10mb
+       - RUST_LOG=none,sero=trace
+       - JWT_SECRET=mysuperstrongjwtscret
+       # end of section
+       - JWT_TTL_SECONDS=120
+       - SQLX_LOGGING=true
+       - UPLOAD_FOLDER=./sites-uploads
+
+
+volumes:
+  server-files:
+  pgdata:
