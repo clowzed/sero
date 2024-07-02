@@ -28,6 +28,7 @@ impl IntoResponse for EnableError {
         let reason = self.to_string();
         let status_code: StatusCode = self.into();
 
+        tracing::error!(%reason, %status_code, "Error occurred while trying to handle request!");
         (status_code, Json(Details { reason })).into_response()
     }
 }
