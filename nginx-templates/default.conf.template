@@ -3,8 +3,19 @@ server {
     server_name ~^(?<subdomain>\w*)\.${DOMAIN}.${ZONE}${DOLLAR};
 
     location / {
-        # Always set the X-subdomain header with the value from the subdomain in the URL
-        proxy_set_header x-subdomain $subdomain;
+        if ($http_x_subdomain = "") {
+            set $http_x_subdomain $subdomain;
+        }
+        proxy_set_header X-Subdomain $http_x_subdomain;
+        proxy_pass http://${SERVER}:${SERVER_PORT}/;
+    }
+}
+
+server {
+    listen 80;
+    server_name ${DOMAIN}.${ZONE};
+
+    location / {
         proxy_pass http://${SERVER}:${SERVER_PORT}/;
     }
 }
