@@ -1,13 +1,14 @@
+map $http_host $subdomain {
+    ~^(?<subdomain>[a-zA-Z0-9-]+)\.${DOMAIN}\.${ZONE}${DOLLAR} $subdomain;
+}
+
 server {
     listen 80;
-    server_name ~^(?<subdomain>\w*)\.${DOMAIN}.${ZONE}${DOLLAR};
+    server_name ~^(?<subdomain>[a-zA-Z0-9-]+)\.${DOMAIN}\.${ZONE}${DOLLAR};
 
     location / {
-        if ($http_x_subdomain = "") {
-            set $http_x_subdomain $subdomain;
-        }
-        proxy_set_header X-Subdomain $http_x_subdomain;
-        proxy_pass http://${SERVER}:${SERVER_PORT}/;
+        proxy_set_header X-Subdomain $subdomain;
+        proxy_pass http://${SERVER}:${SERVER_PORT};
     }
 }
 
@@ -16,6 +17,6 @@ server {
     server_name ${DOMAIN}.${ZONE};
 
     location / {
-        proxy_pass http://${SERVER}:${SERVER_PORT}/;
+        proxy_pass http://${SERVER}:${SERVER_PORT};
     }
 }
