@@ -9,7 +9,7 @@ pub mod tests {
             origin::{create::tests::call::tests::create, tests::preflight},
             site::{page::tests::call::tests::page, upload::tests::call::tests::upload},
         },
-        app,
+        app, enable_logging,
     };
     use axum_test::TestServer as TestClient;
     use uuid::Uuid;
@@ -17,6 +17,7 @@ pub mod tests {
     #[tokio::test]
     async fn correct() {
         dotenvy::from_filename_override(".env.tests").ok();
+        let _guard: tracing_appender::non_blocking::WorkerGuard = enable_logging().await.expect("Failed to enable logging");
 
         let (app, _state) = app().await.expect("Failed to initialize application!");
         let app_cloned = app.clone();
