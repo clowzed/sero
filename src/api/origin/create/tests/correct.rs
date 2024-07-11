@@ -9,7 +9,7 @@ pub mod tests {
             origin::{create::tests::call::tests::create, tests::preflight},
             site::{page::tests::call::tests::page, upload::tests::call::tests::upload},
         },
-        app, enable_logging,
+        app,
     };
     use axum_test::TestServer as TestClient;
     use uuid::Uuid;
