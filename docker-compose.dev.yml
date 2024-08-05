@@ -35,6 +35,8 @@ services:
       - 80:80
     links:
       - server
+    depends_on:
+      - server
 
   server:
     image: clowzed/sero:dev-unstable
