@@ -44,11 +44,11 @@ impl Service {
                     .filename()
                     .as_str()
                     .inspect_err(|cause| tracing::warn!(%cause, "Failed to convert entry filepath to str"))?;
-                PathBuf::from(entry_filename).components().skip(1).collect::<PathBuf>()
+                PathBuf::from(entry_filename)
             };
             tracing::trace!(?path, "Entry filepath was successfully retrieved");
 
-            //? Generating filename for entry
+            //? Generating filename for enty
             // Just random to prevent collisions
             let u1 = Uuid::new_v4();
             let u2 = Uuid::new_v4();

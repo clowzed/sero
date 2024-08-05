@@ -247,10 +247,10 @@ pub async fn app() -> Result<(Router, Arc<State>), AppCreationError> {
 
     let mut app = Router::new()
         .merge(openapi)
-        .nest("/api", api::router())
         .route("/*path", get(api::site::page::handler::implementation))
         .route("/", get(api::site::page::handler::redirect::implementation))
         .layer(cors_layer)
+        .nest("/api", api::router())
         .layer(tracing_layer)
         .layer(TimeoutLayer::new(Duration::from_secs(10)))
         .with_state(state.clone());

@@ -39,7 +39,7 @@ services:
       - server
 
   server:
-    image: clowzed/sero
+    image: clowzed/sero:dev-unstable
     build: .
     depends_on:
       database:

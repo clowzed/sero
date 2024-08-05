@@ -104,3 +104,53 @@ jobs:
           push: true
           tags: clowzed/sero:v${{ needs.get-tag.outputs.pkg-version }}
           labels: ${{ steps.meta.outputs.labels }}
+  upload-openapi-client:
+    needs:
+      - "push-to-registry"
+    name: "Build and upload openapi python client"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+
+      - name: Install OpenAPI Generator CLI
+        run: |
+          npm install @openapitools/openapi-generator-cli -g
+      - name: Extract version from OpenAPI spec
+        id: extract_version
+        run: |
+          VERSION=$(jq -r '.info.version' openapi.json)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Generate Python client from OpenAPI spec
+        run: |
+          openapi-generator-cli generate -i openapi.json -g python -o seroapi --additional-properties=packageName=seroapi,packageVersion=${{ env.VERSION }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.in-project true
+
+      - name: Install dependencies
+        run: |
+          cd seroapi
+          poetry install
+
+      - name: Publish to Test PyPI
+        run: |
+          cd seroapi
+          poetry publish -u __token__ -p ${{ secrets.PYPI_PASSWORD }} --build
