@@ -21,31 +21,24 @@
 </p>
 </p>
 
-# Warning
-
-> [!CAUTION]
->
-> **_This project was in a huge rewrite and upload tool and docs are not updated!
-> THis will be fixed very soon._**
-
 ## 📖 Table Of Contents
 
-- [Warning!](#warning)
-  - [📖 Table Of Contents](#-table-of-contents)
-  - [Docs](#docs)
-  - [🔧 Tools](#-tools)
-  - [❓ About The Project](#-about-the-project)
-  - [🚀 Features](#-features)
-  - [🔌 Built With](#-built-with)
-  - [📍 Roadmap](#-roadmap)
-  - [🧑‍🤝‍🧑 Contributing](#-contributing)
+- [📖 Table Of Contents](#-table-of-contents)
+- [Docs](#docs)
+- [🔧 Tools](#-tools)
+- [❓ About The Project](#-about-the-project)
+- [🚀 Features](#-features)
+- [🔌 Built With](#-built-with)
+- [📍 Roadmap](#-roadmap)
+- [🧑‍🤝‍🧑 Contributing](#-contributing)
     - [Creating A Pull Request](#creating-a-pull-request)
-  - [License](#license)
-  - [Authors](#authors)
+- [License](#license)
+- [Authors](#authors)
 
 ## Docs
 
-Read [docs here]("http://sero-docs.clowzed.ru") for fast installation.
+In progress...
+~~Read [docs here]("http://sero-docs.clowzed.ru") for fast installation.~~
 
 ## 🔧 Tools
 
