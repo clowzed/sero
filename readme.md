@@ -31,7 +31,7 @@
 - [🔌 Built With](#-built-with)
 - [📍 Roadmap](#-roadmap)
 - [🧑‍🤝‍🧑 Contributing](#-contributing)
-    - [Creating A Pull Request](#creating-a-pull-request)
+  - [Creating A Pull Request](#creating-a-pull-request)
 - [License](#license)
 - [Authors](#authors)
 
@@ -63,7 +63,7 @@ One key feature that it is self-hosted. This gives users more flexibility and co
 - Custom 503.html `new` `(on disabled site)`
 - Clean urls
 - Dynamic CORS Management
-- `[WIP]` Server events with websocket
+- `[WIP]` SSE
 
 ## 🔌 Built With
 

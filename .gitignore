@@ -4,3 +4,4 @@ sites-uploads
 logs
 test_upload_files
 .env
+openapi.json

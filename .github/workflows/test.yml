@@ -46,24 +46,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: "Get version from Cargo.toml"
-        id: "get-cargo-version"
-        shell: "bash"
-        run: |
-          echo PKG_VERSION=$(awk -F ' = ' '$1 ~ /version/ { gsub(/["]/, "", $2); printf("%s",$2) }' Cargo.toml) >> $GITHUB_OUTPUT
-      - name: Get version from openapi.json
-        id: get-openapi-version
-        run: |
-          echo OAPI_VERSION=$(jq -r '.info.version' openapi.json) >> $GITHUB_OUTPUT
-
-      - name: Compare versions
-        run: |
-          if [ "${{ steps.get-cargo-version.outputs.PKG_VERSION }}" != "${{ steps.get-openapi-version.outputs.OAPI_VERSION }}" ]; then
-            echo "Version mismatch between cargo.toml and generated OpenAPI JSON."
-            exit 1
-          else
-            echo "Version matches between cargo.toml and generated OpenAPI JSON."
-          fi
       - name: Run tests (with database service)
         run: cargo test --verbose -- --test-threads=1
 
