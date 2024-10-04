@@ -38,7 +38,7 @@
 ## Docs
 
 In progress...
-~~Read [docs here]("http://sero-docs.clowzed.ru") for fast installation.~~
+Read [docs here]("http://sero-docs.clowzed.ru") for fast installation.
 
 ## 🔧 Tools
 
