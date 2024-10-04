@@ -1,6 +1,6 @@
 [package]
 name = "sero"
-version = "0.2.7"
+version = "0.2.8"
 edition = "2021"
 authors = ["clowzed <clowzed.work@gmail.com>"]
 description = "Muiltidomain static site hosting"
@@ -11,19 +11,19 @@ license = "MIT"
 [dependencies]
 envy = "0.4.2"
 sea-orm = { version = "0.12.3", features = [
-	"sqlx-postgres",
-	"runtime-tokio-rustls",
-	"macros",
+    "sqlx-postgres",
+    "runtime-tokio-rustls",
+    "macros",
 ] }
 tokio = { version = "1.32.0", features = ["full"] }
 tokio-postgres = "0.7.10"
 tracing = { version = "0.1.37", features = ["async-await"] }
 tracing-subscriber = { version = "0.3.17", features = [
-	"env-filter",
-	"fmt",
-	"ansi",
-	"std",
-	"json",
+    "env-filter",
+    "fmt",
+    "ansi",
+    "std",
+    "json",
 ] }
 entity = { path = "entity" }
 migration = { path = "migration" }
@@ -41,9 +41,9 @@ mime = "0.3.17"
 mime_guess = "2.0.4"
 argon2 = { version = "0.5.3", features = ["std"] }
 utoipa = { version = "4.2.0", features = [
-	"axum_extras",
-	"chrono",
-	"preserve_order",
+    "axum_extras",
+    "chrono",
+    "preserve_order",
 ] }
 dotenvy = "0.15.7"
 toml = "0.8.8"
@@ -52,16 +52,16 @@ utoipa-rapidoc = { version = "4.0.0", features = ["axum"] }
 utoipa-redoc = { version = "4.0.0", features = ["axum"] }
 utoipa-swagger-ui = { version = "7.1.0", features = ["axum"] }
 axum = { version = "0.7.4", features = [
-	"macros",
-	"tracing",
-	"json",
-	"multipart",
+    "macros",
+    "tracing",
+    "json",
+    "multipart",
 ] }
 axum_typed_multipart = "0.11.0"
 tower-http = { git = "https://github.com/tower-rs/tower-http.git", features = [
-	"cors",
-	"trace",
-	"timeout",
+    "cors",
+    "trace",
+    "timeout",
 ] }
 tower = { version = "0.4.13", features = ["util"] }
 hyper = "0.14.28"

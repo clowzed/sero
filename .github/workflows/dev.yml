@@ -3,7 +3,7 @@ name: "Test"
 on:
   push:
     branches:
-      - "dev" # matches every branch
+      - "dev"
 
 jobs:
   push-to-registry:
